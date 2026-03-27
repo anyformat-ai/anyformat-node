@@ -1,12 +1,12 @@
 {
   "name": "anyformat",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The official TypeScript library for the Anyformat API",
   "author": "Anyformat <>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
-  "repository": "github:stainless-sdks/anyformat-typescript",
+  "repository": "github:anyformat-ai/anyformat-node",
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.30.1",
   "files": [
