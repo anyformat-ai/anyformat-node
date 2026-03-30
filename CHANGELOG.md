@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.3 (2026-03-30)
+
+Full Changelog: [v0.0.2...v0.0.3](https://github.com/anyformat-ai/anyformat-node/compare/v0.0.2...v0.0.3)
+
+### Chores
+
+* configure new SDK language ([a6c8e39](https://github.com/anyformat-ai/anyformat-node/commit/a6c8e390791a6dd85d8af301d4069a1cd83fafd2))
+
 ## 0.0.2 (2026-03-27)
 
 Full Changelog: [v0.0.1...v0.0.2](https://github.com/anyformat-ai/anyformat-node/compare/v0.0.1...v0.0.2)
