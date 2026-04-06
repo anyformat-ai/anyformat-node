@@ -51,34 +51,6 @@ type SearchResult = {
 
 const EMBEDDED_METHODS: MethodEntry[] = [
   {
-    name: 'health_check',
-    endpoint: '/',
-    httpMethod: 'get',
-    summary: 'Health Check',
-    description:
-      'Health check endpoint.\n\nReturns 200 OK if the service is running.\nNo authentication required.',
-    stainlessPath: '(resource) $client > (method) health_check',
-    qualified: 'client.healthCheck',
-    response: 'object',
-    markdown:
-      "## health_check\n\n`client.healthCheck(): object`\n\n**get** `/`\n\nHealth check endpoint.\n\nReturns 200 OK if the service is running.\nNo authentication required.\n\n### Returns\n\n- `object`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat';\n\nconst client = new Anyformat();\n\nconst response = await client.healthCheck();\n\nconsole.log(response);\n```",
-    perLanguage: {
-      http: {
-        example: 'curl https://api.anyformat.ai/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
-      },
-      python: {
-        method: 'health_check',
-        example:
-          'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.health_check()\nprint(response)',
-      },
-      typescript: {
-        method: 'client.healthCheck',
-        example:
-          "import Anyformat from 'anyformat';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.healthCheck();\n\nconsole.log(response);",
-      },
-    },
-  },
-  {
     name: 'check',
     endpoint: '/health/',
     httpMethod: 'get',

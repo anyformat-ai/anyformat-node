@@ -26,7 +26,6 @@ import {
   Files,
 } from './resources/files';
 import { Health, HealthCheckResponse } from './resources/health';
-import { HealthCheckResponse as TopLevelAPIHealthCheckResponse } from './resources/top-level';
 import {
   WebhookCreateParams,
   WebhookCreateResponse,
@@ -220,15 +219,6 @@ export class Anyformat {
    */
   #baseURLOverridden(): boolean {
     return this.baseURL !== 'https://api.anyformat.ai';
-  }
-
-  /**
-   * Health check endpoint.
-   *
-   * Returns 200 OK if the service is running. No authentication required.
-   */
-  healthCheck(options?: RequestOptions): APIPromise<unknown> {
-    return this.get('/', options);
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {
@@ -787,8 +777,6 @@ Anyformat.Workflows = Workflows;
 
 export declare namespace Anyformat {
   export type RequestOptions = Opts.RequestOptions;
-
-  export { type TopLevelAPIHealthCheckResponse as HealthCheckResponse };
 
   export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
