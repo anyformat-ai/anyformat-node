@@ -108,7 +108,6 @@ function getTSDiagnostics(code: string): string[] {
 
 const fuse = new Fuse(
   [
-    'client.healthCheck',
     'client.health.check',
     'client.webhooks.create',
     'client.webhooks.delete',
