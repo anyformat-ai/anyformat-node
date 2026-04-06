@@ -11,12 +11,6 @@ export type SdkMethod = {
 
 export const sdkMethods: SdkMethod[] = [
   {
-    clientCallName: 'client.healthCheck',
-    fullyQualifiedName: 'healthCheck',
-    httpMethod: 'get',
-    httpPath: '/',
-  },
-  {
     clientCallName: 'client.health.check',
     fullyQualifiedName: 'health.check',
     httpMethod: 'get',

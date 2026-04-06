@@ -7,6 +7,10 @@ import ts from 'typescript';
 import { WorkerOutput } from './code-tool-types';
 import { Anyformat, ClientOptions } from 'anyformat';
 
+async function tseval(code: string) {
+  return import('data:application/typescript;charset=utf-8;base64,' + Buffer.from(code).toString('base64'));
+}
+
 function getRunFunctionSource(code: string): {
   type: 'declaration' | 'expression';
   client: string | undefined;
@@ -104,7 +108,6 @@ function getTSDiagnostics(code: string): string[] {
 
 const fuse = new Fuse(
   [
-    'client.healthCheck',
     'client.health.check',
     'client.webhooks.create',
     'client.webhooks.delete',
@@ -253,7 +256,9 @@ const fetch = async (req: Request): Promise<Response> => {
 
   const log_lines: string[] = [];
   const err_lines: string[] = [];
-  const console = {
+  const originalConsole = globalThis.console;
+  globalThis.console = {
+    ...originalConsole,
     log: (...args: unknown[]) => {
       log_lines.push(util.format(...args));
     },
@@ -263,7 +268,7 @@ const fetch = async (req: Request): Promise<Response> => {
   };
   try {
     let run_ = async (client: any) => {};
-    eval(`${code}\nrun_ = run;`);
+    run_ = (await tseval(`${code}\nexport default run;`)).default;
     const result = await run_(makeSdkProxy(client, { path: ['client'] }));
     return Response.json({
       is_error: false,
@@ -281,6 +286,8 @@ const fetch = async (req: Request): Promise<Response> => {
       } satisfies WorkerOutput,
       { status: 400, statusText: 'Code execution error' },
     );
+  } finally {
+    globalThis.console = originalConsole;
   }
 };
 

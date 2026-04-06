@@ -29,4 +29,3 @@ export {
   type WorkflowRunParams,
   type WorkflowUploadParams,
 } from './workflows';
-export { type HealthCheckResponse } from './top-level';
