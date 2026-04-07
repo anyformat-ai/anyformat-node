@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (2026-04-07)
+
+Full Changelog: [v0.1.0...v0.1.1](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.0...v0.1.1)
+
+### Chores
+
+* **internal:** fix MCP server import ordering ([49b539f](https://github.com/anyformat-ai/anyformat-node/commit/49b539fbde36d29c648edc1b64e8b30c0a2cf06d))
+
 ## 0.1.0 (2026-04-06)
 
 Full Changelog: [v0.0.3...v0.1.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.0.3...v0.1.0)
