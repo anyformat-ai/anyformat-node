@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 (2026-04-10)
+
+Full Changelog: [v0.1.1...v0.1.2](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.1...v0.1.2)
+
+### Chores
+
+* **internal:** codegen related update ([2ccade6](https://github.com/anyformat-ai/anyformat-node/commit/2ccade625a766a8b0a2b3ad2443c797723e0bf2d))
+* **internal:** show error causes in MCP servers when running in local mode ([6c17da3](https://github.com/anyformat-ai/anyformat-node/commit/6c17da3b9747a46df0c5622e1cec10ac40ebe113))
+* **mcp-server:** increase local docs search result count from 5 to 10 ([735a875](https://github.com/anyformat-ai/anyformat-node/commit/735a875a73fabc3df08cf49fc423fe81c73a7525))
+
 ## 0.1.1 (2026-04-07)
 
 Full Changelog: [v0.1.0...v0.1.1](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.0...v0.1.1)
