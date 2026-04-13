@@ -28,7 +28,7 @@ export const newMcpServer = async ({
   new McpServer(
     {
       name: 'anyformat_ai_api',
-      version: '0.1.2',
+      version: '0.1.3',
     },
     {
       instructions: await getInstructions({ stainlessApiKey, customInstructionsPath }),

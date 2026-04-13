@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.3 (2026-04-13)
+
+Full Changelog: [v0.1.2...v0.1.3](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.2...v0.1.3)
+
+### Chores
+
+* update SDK settings ([47024cc](https://github.com/anyformat-ai/anyformat-node/commit/47024ccfb3c1574ab731768ef2a99e624ce517f4))
+* update SDK settings ([c9cc899](https://github.com/anyformat-ai/anyformat-node/commit/c9cc899b68b3ba84715149cca00a28f0453f099c))
+
 ## 0.1.2 (2026-04-10)
 
 Full Changelog: [v0.1.1...v0.1.2](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.1...v0.1.2)
