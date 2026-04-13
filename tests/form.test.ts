@@ -1,5 +1,5 @@
-import { multipartFormRequestOptions, createForm } from 'anyformat/internal/uploads';
-import { toFile } from 'anyformat/core/uploads';
+import { multipartFormRequestOptions, createForm } from 'anyformat_ai/internal/uploads';
+import { toFile } from 'anyformat_ai/core/uploads';
 
 describe('form data validation', () => {
   test('valid values do not error', async () => {
