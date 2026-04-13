@@ -7,8 +7,8 @@ import {
   ListToolsRequestSchema,
   SetLevelRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { ClientOptions } from 'anyformat_ai';
-import Anyformat from 'anyformat_ai';
+import { ClientOptions } from 'anyformat-ai';
+import Anyformat from 'anyformat-ai';
 import { codeTool } from './code-tool';
 import docsSearchTool from './docs-search-tool';
 import { setLocalSearch } from './docs-search-tool';
