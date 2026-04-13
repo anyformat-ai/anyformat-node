@@ -59,8 +59,8 @@ WORKDIR /app
 # Copy the build results, preserving directory structure
 COPY --from=builder /build .
 
-# Copy the built anyformat_ai into node_modules
-COPY --from=builder /build/dist ./node_modules/anyformat_ai
+# Copy the built anyformat-ai into node_modules
+COPY --from=builder /build/dist ./node_modules/anyformat-ai
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
