@@ -10,7 +10,7 @@ You can run the MCP Server directly via `npx`:
 
 ```sh
 export ANYFORMAT_API_KEY="My API Key"
-npx -y anyformat-mcp@latest
+npx -y anyformat-ai-mcp@latest
 ```
 
 ### Via MCP Client
@@ -25,7 +25,7 @@ For clients with a configuration JSON, it might look something like this:
   "mcpServers": {
     "anyformat_ai_api": {
       "command": "npx",
-      "args": ["-y", "anyformat-mcp"],
+      "args": ["-y", "anyformat-ai-mcp"],
       "env": {
         "ANYFORMAT_API_KEY": "My API Key"
       }
@@ -39,14 +39,14 @@ For clients with a configuration JSON, it might look something like this:
 If you use Cursor, you can install the MCP server by using the button below. You will need to set your environment variables
 in Cursor's `mcp.json`, which can be found in Cursor Settings > Tools & MCP > New MCP Server.
 
-[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=anyformat-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImFueWZvcm1hdC1tY3AiXSwiZW52Ijp7IkFOWUZPUk1BVF9BUElfS0VZIjoiTXkgQVBJIEtleSJ9fQ)
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=anyformat-ai-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImFueWZvcm1hdC1haS1tY3AiXSwiZW52Ijp7IkFOWUZPUk1BVF9BUElfS0VZIjoiTXkgQVBJIEtleSJ9fQ)
 
 ### VS Code
 
 If you use MCP, you can install the MCP server by clicking the link below. You will need to set your environment variables
 in VS Code's `mcp.json`, which can be found via Command Palette > MCP: Open User Configuration.
 
-[Open VS Code](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22anyformat-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22anyformat-mcp%22%5D%2C%22env%22%3A%7B%22ANYFORMAT_API_KEY%22%3A%22My%20API%20Key%22%7D%7D)
+[Open VS Code](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22anyformat-ai-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22anyformat-ai-mcp%22%5D%2C%22env%22%3A%7B%22ANYFORMAT_API_KEY%22%3A%22My%20API%20Key%22%7D%7D)
 
 ### Claude Code
 
@@ -54,7 +54,7 @@ If you use Claude Code, you can install the MCP server by running the command be
 environment variables in Claude Code's `.claude.json`, which can be found in your home directory.
 
 ```
-claude mcp add anyformat_mcp_api --env ANYFORMAT_API_KEY="My API Key" -- npx -y anyformat-mcp
+claude mcp add anyformat_ai_mcp_api --env ANYFORMAT_API_KEY="My API Key" -- npx -y anyformat-ai-mcp
 ```
 
 ## Code Mode
