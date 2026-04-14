@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 (2026-04-14)
+
+Full Changelog: [v0.1.3...v0.2.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.3...v0.2.0)
+
+### Features
+
+* **api:** rename anyformat-ai-mcp to anyformat-mcp ([c70ccc3](https://github.com/anyformat-ai/anyformat-node/commit/c70ccc3565a7a356946adbf46f68c8d7a208a1ef))
+
+
+### Chores
+
+* configure new SDK language ([2874f37](https://github.com/anyformat-ai/anyformat-node/commit/2874f3767987200f7f022f5c2341265c16c4f8d7))
+* update SDK settings ([2574484](https://github.com/anyformat-ai/anyformat-node/commit/25744841557453389f8188899bc08d3b98f0e992))
+* update SDK settings ([7e42db2](https://github.com/anyformat-ai/anyformat-node/commit/7e42db28b62335a1e6b5f4267f8999816adfcf93))
+
 ## 0.1.3 (2026-04-13)
 
 Full Changelog: [v0.1.2...v0.1.3](https://github.com/anyformat-ai/anyformat-node/compare/v0.1.2...v0.1.3)
