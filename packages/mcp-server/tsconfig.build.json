@@ -5,8 +5,8 @@
   "compilerOptions": {
     "rootDir": "./dist/src",
     "paths": {
-      "anyformat-ai-mcp/*": ["./dist/src/*"],
-      "anyformat-ai-mcp": ["./dist/src/index.ts"]
+      "anyformat-mcp/*": ["./dist/src/*"],
+      "anyformat-mcp": ["./dist/src/index.ts"]
     },
     "noEmit": false,
     "declaration": true,
