@@ -57,17 +57,6 @@ export class Workflows extends APIResource {
   }
 
   /**
-   * Get workflow results.
-   */
-  results(
-    workflowID: string,
-    query: WorkflowResultsParams | null | undefined = {},
-    options?: RequestOptions,
-  ): APIPromise<unknown> {
-    return this._client.get(path`/v2/workflows/${workflowID}/results/`, { query, ...options });
-  }
-
-  /**
    * Execute workflow — returns collection UUID.
    */
   run(
@@ -154,8 +143,6 @@ export namespace WorkflowListRunsResponse {
   }
 }
 
-export type WorkflowResultsResponse = unknown;
-
 /**
  * Response for workflow run endpoint (v2) — collection UUID as identifier.
  */
@@ -194,32 +181,14 @@ export interface WorkflowListRunsParams {
   page_size?: number;
 }
 
-export interface WorkflowResultsParams {
-  as_lists?: string | null;
-
-  output_format?: string;
-}
-
 export interface WorkflowRunParams {
-  content_type?: string | null;
-
   file?: string | null;
-
-  file_base64?: string | null;
-
-  filename?: string | null;
 
   text?: string | null;
 }
 
 export interface WorkflowUploadParams {
-  content_type?: string | null;
-
   file?: string | null;
-
-  file_base64?: string | null;
-
-  filename?: string | null;
 
   text?: string | null;
 }
@@ -229,12 +198,10 @@ export declare namespace Workflows {
     type Workflow as Workflow,
     type WorkflowListResponse as WorkflowListResponse,
     type WorkflowListRunsResponse as WorkflowListRunsResponse,
-    type WorkflowResultsResponse as WorkflowResultsResponse,
     type WorkflowRunResponse as WorkflowRunResponse,
     type WorkflowUploadResponse as WorkflowUploadResponse,
     type WorkflowListParams as WorkflowListParams,
     type WorkflowListRunsParams as WorkflowListRunsParams,
-    type WorkflowResultsParams as WorkflowResultsParams,
     type WorkflowRunParams as WorkflowRunParams,
     type WorkflowUploadParams as WorkflowUploadParams,
   };
