@@ -98,30 +98,6 @@ describe('resource workflows', () => {
   });
 
   // Mock server tests are disabled
-  test.skip('results', async () => {
-    const responsePromise = client.workflows.results('workflow_id');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // Mock server tests are disabled
-  test.skip('results: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.workflows.results(
-        'workflow_id',
-        { as_lists: 'as_lists', output_format: 'jsonl' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Anyformat.NotFoundError);
-  });
-
-  // Mock server tests are disabled
   test.skip('run', async () => {
     const responsePromise = client.workflows.run('workflow_id');
     const rawResponse = await responsePromise.asResponse();
@@ -139,13 +115,7 @@ describe('resource workflows', () => {
     await expect(
       client.workflows.run(
         'workflow_id',
-        {
-          content_type: 'content_type',
-          file: 'file',
-          file_base64: 'file_base64',
-          filename: 'filename',
-          text: 'text',
-        },
+        { file: 'file', text: 'text' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Anyformat.NotFoundError);
@@ -169,13 +139,7 @@ describe('resource workflows', () => {
     await expect(
       client.workflows.upload(
         'workflow_id',
-        {
-          content_type: 'content_type',
-          file: 'file',
-          file_base64: 'file_base64',
-          filename: 'filename',
-          text: 'text',
-        },
+        { file: 'file', text: 'text' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Anyformat.NotFoundError);
