@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2026-04-21)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* **api:** manual updates ([f0ca263](https://github.com/anyformat-ai/anyformat-node/commit/f0ca263bb541cdca541d7667c5675da747c2135c))
+
 ## 0.3.0 (2026-04-20)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.2.0...v0.3.0)
