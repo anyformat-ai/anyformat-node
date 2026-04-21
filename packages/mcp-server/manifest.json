@@ -4,13 +4,15 @@
   "version": "0.3.0",
   "description": "The official MCP Server for the Anyformat API",
   "author": {
-    "name": "Anyformat"
+    "name": "Anyformat",
+    "email": "support@anyformat.ai"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anyformat-ai/anyformat-node.git"
   },
   "homepage": "https://github.com/anyformat-ai/anyformat-node/tree/main/packages/mcp-server#readme",
+  "documentation": "https://docs.anyformat.ai",
   "server": {
     "type": "node",
     "entry_point": "index.js",

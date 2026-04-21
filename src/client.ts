@@ -27,6 +27,12 @@ import {
 } from './resources/webhooks';
 import {
   Workflow,
+  WorkflowCreateFileParams,
+  WorkflowCreateFileResponse,
+  WorkflowGetFileResultsParams,
+  WorkflowGetFileResultsResponse,
+  WorkflowListFilesParams,
+  WorkflowListFilesResponse,
   WorkflowListParams,
   WorkflowListResponse,
   WorkflowListRunsParams,
@@ -755,9 +761,6 @@ export class Anyformat {
    * File collection management.
    */
   files: API.Files = new API.Files(this);
-  /**
-   * Workflow CRUD, execution, runs, and results.
-   */
   workflows: API.Workflows = new API.Workflows(this);
 }
 
@@ -784,10 +787,16 @@ export declare namespace Anyformat {
     Workflows as Workflows,
     type Workflow as Workflow,
     type WorkflowListResponse as WorkflowListResponse,
+    type WorkflowCreateFileResponse as WorkflowCreateFileResponse,
+    type WorkflowGetFileResultsResponse as WorkflowGetFileResultsResponse,
+    type WorkflowListFilesResponse as WorkflowListFilesResponse,
     type WorkflowListRunsResponse as WorkflowListRunsResponse,
     type WorkflowRunResponse as WorkflowRunResponse,
     type WorkflowUploadResponse as WorkflowUploadResponse,
     type WorkflowListParams as WorkflowListParams,
+    type WorkflowCreateFileParams as WorkflowCreateFileParams,
+    type WorkflowGetFileResultsParams as WorkflowGetFileResultsParams,
+    type WorkflowListFilesParams as WorkflowListFilesParams,
     type WorkflowListRunsParams as WorkflowListRunsParams,
     type WorkflowRunParams as WorkflowRunParams,
     type WorkflowUploadParams as WorkflowUploadParams,

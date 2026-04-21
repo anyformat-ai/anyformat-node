@@ -74,6 +74,64 @@ describe('resource workflows', () => {
   });
 
   // Mock server tests are disabled
+  test.skip('createFile: only required params', async () => {
+    const responsePromise = client.workflows.createFile('workflow_id', { files: ['string'] });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('createFile: required and optional params', async () => {
+    const response = await client.workflows.createFile('workflow_id', { files: ['string'] });
+  });
+
+  // Mock server tests are disabled
+  test.skip('getFileResults: only required params', async () => {
+    const responsePromise = client.workflows.getFileResults('collection_id', { workflow_id: 'workflow_id' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('getFileResults: required and optional params', async () => {
+    const response = await client.workflows.getFileResults('collection_id', { workflow_id: 'workflow_id' });
+  });
+
+  // Mock server tests are disabled
+  test.skip('listFiles', async () => {
+    const responsePromise = client.workflows.listFiles('workflow_id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('listFiles: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.workflows.listFiles(
+        'workflow_id',
+        { page: 1, page_size: 1 },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Anyformat.NotFoundError);
+  });
+
+  // Mock server tests are disabled
   test.skip('listRuns', async () => {
     const responsePromise = client.workflows.listRuns('workflow_id');
     const rawResponse = await responsePromise.asResponse();

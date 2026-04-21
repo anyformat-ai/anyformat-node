@@ -2,7 +2,7 @@
   "name": "anyformat-mcp",
   "version": "0.3.0",
   "description": "The official MCP Server for the Anyformat API",
-  "author": "Anyformat <>",
+  "author": "Anyformat <support@anyformat.ai>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
