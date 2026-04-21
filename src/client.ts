@@ -17,14 +17,7 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import {
-  FileCreateParams,
-  FileCreateResponse,
-  FileGetExtractionResultsResponse,
-  FileListParams,
-  FileListResponse,
-  Files,
-} from './resources/files';
+import { Files } from './resources/files';
 import { Health, HealthCheckResponse } from './resources/health';
 import {
   WebhookCreateParams,
@@ -38,8 +31,6 @@ import {
   WorkflowListResponse,
   WorkflowListRunsParams,
   WorkflowListRunsResponse,
-  WorkflowResultsParams,
-  WorkflowResultsResponse,
   WorkflowRunParams,
   WorkflowRunResponse,
   WorkflowUploadParams,
@@ -787,26 +778,17 @@ export declare namespace Anyformat {
     type WebhookCreateParams as WebhookCreateParams,
   };
 
-  export {
-    Files as Files,
-    type FileCreateResponse as FileCreateResponse,
-    type FileListResponse as FileListResponse,
-    type FileGetExtractionResultsResponse as FileGetExtractionResultsResponse,
-    type FileCreateParams as FileCreateParams,
-    type FileListParams as FileListParams,
-  };
+  export { Files as Files };
 
   export {
     Workflows as Workflows,
     type Workflow as Workflow,
     type WorkflowListResponse as WorkflowListResponse,
     type WorkflowListRunsResponse as WorkflowListRunsResponse,
-    type WorkflowResultsResponse as WorkflowResultsResponse,
     type WorkflowRunResponse as WorkflowRunResponse,
     type WorkflowUploadResponse as WorkflowUploadResponse,
     type WorkflowListParams as WorkflowListParams,
     type WorkflowListRunsParams as WorkflowListRunsParams,
-    type WorkflowResultsParams as WorkflowResultsParams,
     type WorkflowRunParams as WorkflowRunParams,
     type WorkflowUploadParams as WorkflowUploadParams,
   };

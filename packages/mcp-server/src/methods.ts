@@ -35,28 +35,10 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v2/webhooks/{webhook_id}/',
   },
   {
-    clientCallName: 'client.files.create',
-    fullyQualifiedName: 'files.create',
-    httpMethod: 'post',
-    httpPath: '/v2/files/',
-  },
-  {
-    clientCallName: 'client.files.list',
-    fullyQualifiedName: 'files.list',
-    httpMethod: 'get',
-    httpPath: '/v2/files/',
-  },
-  {
     clientCallName: 'client.files.delete',
     fullyQualifiedName: 'files.delete',
     httpMethod: 'delete',
     httpPath: '/v2/files/{collection_id}/',
-  },
-  {
-    clientCallName: 'client.files.getExtractionResults',
-    fullyQualifiedName: 'files.getExtractionResults',
-    httpMethod: 'get',
-    httpPath: '/v2/files/{collection_id}/extraction/',
   },
   {
     clientCallName: 'client.workflows.create',
@@ -87,12 +69,6 @@ export const sdkMethods: SdkMethod[] = [
     fullyQualifiedName: 'workflows.listRuns',
     httpMethod: 'get',
     httpPath: '/v2/workflows/{workflow_id}/runs/',
-  },
-  {
-    clientCallName: 'client.workflows.results',
-    fullyQualifiedName: 'workflows.results',
-    httpMethod: 'get',
-    httpPath: '/v2/workflows/{workflow_id}/results/',
   },
   {
     clientCallName: 'client.workflows.run',
