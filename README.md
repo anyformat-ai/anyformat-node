@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Anyformat REST API from server-side TypeScript or JavaScript.
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.anyformat.ai](https://docs.anyformat.ai). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -35,7 +35,11 @@ const client = new Anyformat({
   apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted
 });
 
-const response = await client.health.check();
+const response = await client.workflows.run('0686bb97-8c30-70f0-8000-97669e000eb8', {
+  text: 'Invoice #12345\nDate: 2025-01-15\nAmount: $1,250.00\nVendor: Acme Corp',
+});
+
+console.log(response.id);
 ```
 
 ### Request & Response types
@@ -229,7 +233,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.health.check({
+client.workflows.run({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',

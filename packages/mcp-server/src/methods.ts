@@ -65,6 +65,24 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v2/workflows/{workflow_id}/',
   },
   {
+    clientCallName: 'client.workflows.createFile',
+    fullyQualifiedName: 'workflows.createFile',
+    httpMethod: 'post',
+    httpPath: '/v2/workflows/{workflow_id}/files/',
+  },
+  {
+    clientCallName: 'client.workflows.getFileResults',
+    fullyQualifiedName: 'workflows.getFileResults',
+    httpMethod: 'get',
+    httpPath: '/v2/workflows/{workflow_id}/files/{collection_id}/results/',
+  },
+  {
+    clientCallName: 'client.workflows.listFiles',
+    fullyQualifiedName: 'workflows.listFiles',
+    httpMethod: 'get',
+    httpPath: '/v2/workflows/{workflow_id}/files/',
+  },
+  {
     clientCallName: 'client.workflows.listRuns',
     fullyQualifiedName: 'workflows.listRuns',
     httpMethod: 'get',
