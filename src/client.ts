@@ -750,15 +750,15 @@ export class Anyformat {
   static toFile = Uploads.toFile;
 
   /**
-   * Health checks.
+   * Health check endpoints to verify API availability.
    */
   health: API.Health = new API.Health(this);
   /**
-   * Webhook subscriptions for async notifications.
+   * Webhook subscriptions for asynchronous event notifications. Get notified when extractions complete or fail.
    */
   webhooks: API.Webhooks = new API.Webhooks(this);
   /**
-   * File collection management.
+   * File collections group uploaded documents and track their extraction progress. Upload files, check status, and retrieve extraction results.
    */
   files: API.Files = new API.Files(this);
   workflows: API.Workflows = new API.Workflows(this);
