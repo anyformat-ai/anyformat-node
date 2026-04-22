@@ -10,7 +10,7 @@ const client = new Anyformat({
 describe('resource webhooks', () => {
   // Mock server tests are disabled
   test.skip('create: only required params', async () => {
-    const responsePromise = client.webhooks.create({ url: 'https://example.com' });
+    const responsePromise = client.webhooks.create({ url: 'https://example.com/webhooks/anyformat' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,7 +22,10 @@ describe('resource webhooks', () => {
 
   // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
-    const response = await client.webhooks.create({ url: 'https://example.com', events: ['string'] });
+    const response = await client.webhooks.create({
+      url: 'https://example.com/webhooks/anyformat',
+      events: ['extraction.completed', 'extraction.failed'],
+    });
   });
 
   // Mock server tests are disabled
