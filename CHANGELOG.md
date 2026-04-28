@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0 (2026-04-28)
+
+Full Changelog: [v0.4.0...v0.5.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.4.0...v0.5.0)
+
+### Features
+
+* **api:** api update ([91bfb5a](https://github.com/anyformat-ai/anyformat-node/commit/91bfb5a2aa82e001db9d17c13d144eac32dce63c))
+* support setting headers via env ([3f1b0cb](https://github.com/anyformat-ai/anyformat-node/commit/3f1b0cb8b5d48bf7c3068129d6df96818101a05f))
+
+
+### Chores
+
+* **internal:** codegen related update ([8b616d8](https://github.com/anyformat-ai/anyformat-node/commit/8b616d8f37b830c6529ea3a62578bcdf4b6c020e))
+* **internal:** more robust bootstrap script ([e6303b8](https://github.com/anyformat-ai/anyformat-node/commit/e6303b83e1d5a698a5b90cfd7b5133624981b604))
+* **internal:** update docs ordering ([3ed17b7](https://github.com/anyformat-ai/anyformat-node/commit/3ed17b7e3bd427ac3c2701ff5e5399f3f2911dcb))
+* restructure docs search code ([df0a714](https://github.com/anyformat-ai/anyformat-node/commit/df0a71455f5541b3271b789da7e19a247bab2ad3))
+
 ## 0.4.0 (2026-04-21)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.3.0...v0.4.0)
