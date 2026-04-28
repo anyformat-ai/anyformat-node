@@ -615,24 +615,25 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     stainlessPath: '(resource) workflows > (method) get_file_results',
     qualified: 'client.workflows.getFileResults',
     params: ['workflow_id: string;', 'collection_id: string;'],
-    response: 'object',
+    response:
+      '{ collection_id: string; extraction?: object; parse?: { markdown: string; }; verification_url?: string; }',
     markdown:
-      "## get_file_results\n\n`client.workflows.getFileResults(workflow_id: string, collection_id: string): object`\n\n**get** `/v2/workflows/{workflow_id}/files/{collection_id}/results/`\n\nRetrieve the extraction results for a file collection.\n\nReturns the structured data extracted from each file, including field values,\nconfidence scores, and source evidence (text excerpts and page numbers). Also\nincludes a `verification_url` linking to the AnyFormat dashboard for human review.\n\nReturns **412 Precondition Failed** if the extraction is still in progress. Poll\nthis endpoint until you receive a 200 response, or use webhooks\n(`extraction.completed` event) to be notified when processing finishes.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `collection_id: string`\n\n### Returns\n\n- `object`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.getFileResults('collection_id', { workflow_id: 'workflow_id' });\n\nconsole.log(response);\n```",
+      "## get_file_results\n\n`client.workflows.getFileResults(workflow_id: string, collection_id: string): { collection_id: string; extraction?: object; parse?: object; verification_url?: string; }`\n\n**get** `/v2/workflows/{workflow_id}/files/{collection_id}/results/`\n\nRetrieve the extraction results for a file collection.\n\nReturns the structured data extracted from each file, including field values,\nconfidence scores, and source evidence (text excerpts and page numbers). Also\nincludes a `verification_url` linking to the AnyFormat dashboard for human review.\n\nReturns **412 Precondition Failed** if the extraction is still in progress. Poll\nthis endpoint until you receive a 200 response, or use webhooks\n(`extraction.completed` event) to be notified when processing finishes.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `collection_id: string`\n\n### Returns\n\n- `{ collection_id: string; extraction?: object; parse?: { markdown: string; }; verification_url?: string; }`\n  Canonical response shape for the file-collection results endpoint.\n\nReturned with HTTP 200 once processing completes. Returns 412 while processing is\nin progress; poll until 200, or use webhooks.\n\n  - `collection_id: string`\n  - `extraction?: object`\n  - `parse?: { markdown: string; }`\n  - `verification_url?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.getFileResults('collection_id', { workflow_id: 'workflow_id' });\n\nconsole.log(response);\n```",
     perLanguage: {
       typescript: {
         method: 'client.workflows.getFileResults',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.getFileResults('collection_id', {\n  workflow_id: 'workflow_id',\n});\n\nconsole.log(response);",
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.getFileResults('collection_id', {\n  workflow_id: 'workflow_id',\n});\n\nconsole.log(response.collection_id);",
       },
       python: {
         method: 'workflows.get_file_results',
         example:
-          'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.get_file_results(\n    collection_id="collection_id",\n    workflow_id="workflow_id",\n)\nprint(response)',
+          'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.get_file_results(\n    collection_id="collection_id",\n    workflow_id="workflow_id",\n)\nprint(response.collection_id)',
       },
       go: {
         method: 'client.Workflows.GetFileResults',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.GetFileResults(\n\t\tcontext.TODO(),\n\t\t"collection_id",\n\t\tanyformat.WorkflowGetFileResultsParams{\n\t\t\tWorkflowID: "workflow_id",\n\t\t},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response)\n}\n',
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.GetFileResults(\n\t\tcontext.TODO(),\n\t\t"collection_id",\n\t\tanyformat.WorkflowGetFileResultsParams{\n\t\t\tWorkflowID: "workflow_id",\n\t\t},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.CollectionID)\n}\n',
       },
       cli: {
         method: 'workflows get_file_results',
