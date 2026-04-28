@@ -47,7 +47,7 @@ Methods:
 - <code title="get /v2/workflows/">client.workflows.<a href="./src/resources/workflows.ts">list</a>({ ...params }) -> WorkflowListResponse</code>
 - <code title="delete /v2/workflows/{workflow_id}/">client.workflows.<a href="./src/resources/workflows.ts">delete</a>(workflowID) -> void</code>
 - <code title="post /v2/workflows/{workflow_id}/files/">client.workflows.<a href="./src/resources/workflows.ts">createFile</a>(workflowID, { ...params }) -> WorkflowCreateFileResponse</code>
-- <code title="get /v2/workflows/{workflow_id}/files/{collection_id}/results/">client.workflows.<a href="./src/resources/workflows.ts">getFileResults</a>(collectionID, { ...params }) -> unknown</code>
+- <code title="get /v2/workflows/{workflow_id}/files/{collection_id}/results/">client.workflows.<a href="./src/resources/workflows.ts">getFileResults</a>(collectionID, { ...params }) -> WorkflowGetFileResultsResponse</code>
 - <code title="get /v2/workflows/{workflow_id}/files/">client.workflows.<a href="./src/resources/workflows.ts">listFiles</a>(workflowID, { ...params }) -> WorkflowListFilesResponse</code>
 - <code title="get /v2/workflows/{workflow_id}/runs/">client.workflows.<a href="./src/resources/workflows.ts">listRuns</a>(workflowID, { ...params }) -> WorkflowListRunsResponse</code>
 - <code title="post /v2/workflows/{workflow_id}/run/">client.workflows.<a href="./src/resources/workflows.ts">run</a>(workflowID, { ...params }) -> WorkflowRunResponse</code>
