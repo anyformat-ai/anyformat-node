@@ -87,7 +87,7 @@ export class Workflows extends APIResource {
     collectionID: string,
     params: WorkflowGetFileResultsParams,
     options?: RequestOptions,
-  ): APIPromise<unknown> {
+  ): APIPromise<WorkflowGetFileResultsResponse> {
     const { workflow_id } = params;
     return this._client.get(path`/v2/workflows/${workflow_id}/files/${collectionID}/results/`, options);
   }
@@ -268,7 +268,161 @@ export namespace WorkflowCreateFileResponse {
   }
 }
 
-export type WorkflowGetFileResultsResponse = unknown;
+/**
+ * Canonical response shape for the file-collection results endpoint.
+ *
+ * Returned with HTTP 200 once processing completes. Returns 412 while processing
+ * is in progress; poll until 200, or use webhooks.
+ */
+export interface WorkflowGetFileResultsResponse {
+  /**
+   * The file collection's UUID. Same value as the `id` returned by
+   * `POST /v2/workflows/{wid}/run/`.
+   */
+  collection_id: string;
+
+  /**
+   * Extracted fields keyed by field name. `null` for parse-only workflows. Always
+   * present in the response. Each value is either a scalar field (`ExtractedField`)
+   * or a list of object-field rows (`list[dict[str, ExtractedField]]`) for compound
+   * fields like line items.
+   */
+  extraction?: {
+    [key: string]:
+      | WorkflowGetFileResultsResponse.ExtractedField
+      | Array<{ [key: string]: WorkflowGetFileResultsResponse.ExtractedField }>;
+  } | null;
+
+  /**
+   * Parsed markdown for a file.
+   */
+  parse?: WorkflowGetFileResultsResponse.Parse | null;
+
+  /**
+   * Link to the AnyFormat dashboard for human review of this collection's results.
+   * `null` if the dashboard URL cannot be constructed (e.g. no files in the
+   * collection, or the deployment has no frontend URL configured).
+   */
+  verification_url?: string | null;
+}
+
+export namespace WorkflowGetFileResultsResponse {
+  /**
+   * One extracted field's value, confidence, and supporting evidence.
+   */
+  export interface ExtractedField {
+    /**
+     * The extracted value. Type depends on the field's `data_type` (string, number,
+     * date, etc.). `null` when extraction could not produce a value.
+     */
+    value: unknown;
+
+    /**
+     * Model confidence in the extracted value, on a 0-100 scale. `null` when the
+     * backend did not produce a confidence (e.g. manual entry).
+     */
+    confidence?: number | null;
+
+    /**
+     * Source-text snippets the model used to derive this value.
+     */
+    evidence?: Array<ExtractedField.Evidence>;
+
+    /**
+     * A human-supplied override of the extracted `value`, if one was set during
+     * verification. `null` when no override exists.
+     */
+    value_override?: unknown;
+
+    /**
+     * Verification state for this datapoint (e.g. `not_verified`, `verified`). `null`
+     * when not yet reviewed.
+     */
+    verification_status?: string | null;
+  }
+
+  export namespace ExtractedField {
+    /**
+     * A snippet of source text supporting an extracted value, with the page it came
+     * from.
+     */
+    export interface Evidence {
+      /**
+       * 1-indexed page number where the snippet was found.
+       */
+      page_number: number;
+
+      /**
+       * The exact source-text snippet that supports the extracted value.
+       */
+      text: string;
+    }
+  }
+
+  /**
+   * One extracted field's value, confidence, and supporting evidence.
+   */
+  export interface ExtractedField {
+    /**
+     * The extracted value. Type depends on the field's `data_type` (string, number,
+     * date, etc.). `null` when extraction could not produce a value.
+     */
+    value: unknown;
+
+    /**
+     * Model confidence in the extracted value, on a 0-100 scale. `null` when the
+     * backend did not produce a confidence (e.g. manual entry).
+     */
+    confidence?: number | null;
+
+    /**
+     * Source-text snippets the model used to derive this value.
+     */
+    evidence?: Array<ExtractedField.Evidence>;
+
+    /**
+     * A human-supplied override of the extracted `value`, if one was set during
+     * verification. `null` when no override exists.
+     */
+    value_override?: unknown;
+
+    /**
+     * Verification state for this datapoint (e.g. `not_verified`, `verified`). `null`
+     * when not yet reviewed.
+     */
+    verification_status?: string | null;
+  }
+
+  export namespace ExtractedField {
+    /**
+     * A snippet of source text supporting an extracted value, with the page it came
+     * from.
+     */
+    export interface Evidence {
+      /**
+       * 1-indexed page number where the snippet was found.
+       */
+      page_number: number;
+
+      /**
+       * The exact source-text snippet that supports the extracted value.
+       */
+      text: string;
+    }
+  }
+
+  /**
+   * Parsed markdown for a file.
+   */
+  export interface Parse {
+    /**
+     * Document content rendered as structured markdown (with `<DOCUMENT>` /
+     * `<section>` tags, embedded images for the `visual` variant). `null` if parsing
+     * failed.
+     */
+    markdown: string | null;
+  }
+}
 
 export interface WorkflowListFilesResponse {
   /**
@@ -304,7 +458,8 @@ export namespace WorkflowListFilesResponse {
     id: string;
 
     /**
-     * Processing status: `pending`, `processing`, `completed`, or `failed`.
+     * Processing status: `pending`, `queued`, `in_progress`, `processed`, `error`, or
+     * `cancelled`.
      */
     status: string;
 
@@ -363,7 +518,8 @@ export namespace WorkflowListRunsResponse {
     id: string;
 
     /**
-     * Processing status: `pending`, `processing`, `completed`, or `failed`.
+     * Processing status: `pending`, `queued`, `in_progress`, `processed`, `error`, or
+     * `cancelled`.
      */
     status: string;
 
