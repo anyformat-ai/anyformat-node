@@ -63,28 +63,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## check\n\n`client.health.check(): { message: string; }`\n\n**get** `/health/`\n\nReturns 200 OK if the service is running. No authentication required.\n\nUse this endpoint to verify API connectivity before making authenticated calls.\n\n### Returns\n\n- `{ message: string; }`\n  Health check response confirming the API is operational.\n\n  - `message: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.health.check();\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'health check',
-        example: "anyformat health check \\\n  --api-key 'My API Key'",
-      },
-      go: {
-        method: 'client.Health.Check',
+      typescript: {
+        method: 'client.health.check',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Health.Check(context.TODO())\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Message)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/health/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.health.check();\n\nconsole.log(response.message);",
       },
       python: {
         method: 'health.check',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.health.check()\nprint(response.message)',
       },
-      typescript: {
-        method: 'client.health.check',
+      go: {
+        method: 'client.Health.Check',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.health.check();\n\nconsole.log(response.message);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Health.Check(context.TODO())\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Message)\n}\n',
+      },
+      cli: {
+        method: 'health check',
+        example: "anyformat health check \\\n  --api-key 'My API Key'",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/health/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -103,29 +103,29 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## create\n\n`client.webhooks.create(url: string, events?: string[]): { id: string; created_at: string; events: string[]; is_active: boolean; secret: string; url: string; }`\n\n**post** `/v2/webhooks/`\n\nCreate a new webhook subscription for your organization.\n\nThe webhook URL must use HTTPS. AnyFormat will send POST requests to this URL\nwhen the subscribed events occur. The response includes a `secret` that you\nshould use to verify webhook signatures.\n\nSupported events:\n- `extraction.completed` — fired when a file extraction finishes successfully.\n- `extraction.failed` — fired when a file extraction fails.\n\n### Parameters\n\n- `url: string`\n  The HTTPS URL to receive webhook events. Must be publicly accessible.\n\n- `events?: string[]`\n  List of event types to subscribe to. Available events: `extraction.completed`, `extraction.failed`.\n\n### Returns\n\n- `{ id: string; created_at: string; events: string[]; is_active: boolean; secret: string; url: string; }`\n  Webhook subscription details including the signing secret. The secret is only returned at creation time.\n\n  - `id: string`\n  - `created_at: string`\n  - `events: string[]`\n  - `is_active: boolean`\n  - `secret: string`\n  - `url: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst webhook = await client.webhooks.create({ url: 'https://example.com/webhooks/anyformat' });\n\nconsole.log(webhook);\n```",
     perLanguage: {
-      cli: {
-        method: 'webhooks create',
+      typescript: {
+        method: 'client.webhooks.create',
         example:
-          "anyformat webhooks create \\\n  --api-key 'My API Key' \\\n  --url https://example.com/webhooks/anyformat",
-      },
-      go: {
-        method: 'client.Webhooks.New',
-        example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\twebhook, err := client.Webhooks.New(context.TODO(), anyformat.WebhookNewParams{\n\t\tURL: "https://example.com/webhooks/anyformat",\n\t})\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", webhook.ID)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/webhooks/ \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY" \\\n    -d \'{\n          "url": "https://example.com/webhooks/anyformat",\n          "events": [\n            "extraction.completed",\n            "extraction.failed"\n          ]\n        }\'',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst webhook = await client.webhooks.create({ url: 'https://example.com/webhooks/anyformat' });\n\nconsole.log(webhook.id);",
       },
       python: {
         method: 'webhooks.create',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nwebhook = client.webhooks.create(\n    url="https://example.com/webhooks/anyformat",\n)\nprint(webhook.id)',
       },
-      typescript: {
-        method: 'client.webhooks.create',
+      go: {
+        method: 'client.Webhooks.New',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst webhook = await client.webhooks.create({ url: 'https://example.com/webhooks/anyformat' });\n\nconsole.log(webhook.id);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\twebhook, err := client.Webhooks.New(context.TODO(), anyformat.WebhookNewParams{\n\t\tURL: "https://example.com/webhooks/anyformat",\n\t})\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", webhook.ID)\n}\n',
+      },
+      cli: {
+        method: 'webhooks create',
+        example:
+          "anyformat webhooks create \\\n  --api-key 'My API Key' \\\n  --url https://example.com/webhooks/anyformat",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/webhooks/ \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY" \\\n    -d \'{\n          "url": "https://example.com/webhooks/anyformat",\n          "events": [\n            "extraction.completed",\n            "extraction.failed"\n          ]\n        }\'',
       },
     },
   },
@@ -142,28 +142,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## list\n\n`client.webhooks.list(): { id: string; created_at: string; events: string[]; is_active: boolean; url: string; }[]`\n\n**get** `/v2/webhooks/`\n\nList all webhook subscriptions for the authenticated organization.\n\nReturns a list of webhooks. Secrets are excluded from the list response\nfor security — they are only returned once, when the webhook is created.\n\n### Returns\n\n- `{ id: string; created_at: string; events: string[]; is_active: boolean; url: string; }[]`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst webhooks = await client.webhooks.list();\n\nconsole.log(webhooks);\n```",
     perLanguage: {
-      cli: {
-        method: 'webhooks list',
-        example: "anyformat webhooks list \\\n  --api-key 'My API Key'",
-      },
-      go: {
-        method: 'client.Webhooks.List',
+      typescript: {
+        method: 'client.webhooks.list',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\twebhooks, err := client.Webhooks.List(context.TODO())\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", webhooks)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/webhooks/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst webhooks = await client.webhooks.list();\n\nconsole.log(webhooks);",
       },
       python: {
         method: 'webhooks.list',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nwebhooks = client.webhooks.list()\nprint(webhooks)',
       },
-      typescript: {
-        method: 'client.webhooks.list',
+      go: {
+        method: 'client.Webhooks.List',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst webhooks = await client.webhooks.list();\n\nconsole.log(webhooks);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\twebhooks, err := client.Webhooks.List(context.TODO())\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", webhooks)\n}\n',
+      },
+      cli: {
+        method: 'webhooks list',
+        example: "anyformat webhooks list \\\n  --api-key 'My API Key'",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/webhooks/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -180,28 +180,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## delete\n\n`client.webhooks.delete(webhook_id: string): void`\n\n**delete** `/v2/webhooks/{webhook_id}/`\n\nDelete a webhook subscription by ID.\n\nAfter deletion, AnyFormat will stop sending events to the webhook URL.\nThis action is irreversible.\n\n### Parameters\n\n- `webhook_id: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nawait client.webhooks.delete('webhook_id')\n```",
     perLanguage: {
-      cli: {
-        method: 'webhooks delete',
-        example: "anyformat webhooks delete \\\n  --api-key 'My API Key' \\\n  --webhook-id webhook_id",
-      },
-      go: {
-        method: 'client.Webhooks.Delete',
+      typescript: {
+        method: 'client.webhooks.delete',
         example:
-          'package main\n\nimport (\n\t"context"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\terr := client.Webhooks.Delete(context.TODO(), "webhook_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/webhooks/$WEBHOOK_ID/ \\\n    -X DELETE \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nawait client.webhooks.delete('webhook_id');",
       },
       python: {
         method: 'webhooks.delete',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nclient.webhooks.delete(\n    "webhook_id",\n)',
       },
-      typescript: {
-        method: 'client.webhooks.delete',
+      go: {
+        method: 'client.Webhooks.Delete',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nawait client.webhooks.delete('webhook_id');",
+          'package main\n\nimport (\n\t"context"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\terr := client.Webhooks.Delete(context.TODO(), "webhook_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n}\n',
+      },
+      cli: {
+        method: 'webhooks delete',
+        example: "anyformat webhooks delete \\\n  --api-key 'My API Key' \\\n  --webhook-id webhook_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/webhooks/$WEBHOOK_ID/ \\\n    -X DELETE \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -218,28 +218,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## delete\n\n`client.files.delete(collection_id: string): void`\n\n**delete** `/v2/files/{collection_id}/`\n\nDelete a file collection and all its files permanently.\n\nThis removes all uploaded files and any extraction results associated with\nthe collection. This action is irreversible.\n\n### Parameters\n\n- `collection_id: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nawait client.files.delete('collection_id')\n```",
     perLanguage: {
-      cli: {
-        method: 'files delete',
-        example: "anyformat files delete \\\n  --api-key 'My API Key' \\\n  --collection-id collection_id",
-      },
-      go: {
-        method: 'client.Files.Delete',
+      typescript: {
+        method: 'client.files.delete',
         example:
-          'package main\n\nimport (\n\t"context"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\terr := client.Files.Delete(context.TODO(), "collection_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/files/$COLLECTION_ID/ \\\n    -X DELETE \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nawait client.files.delete('collection_id');",
       },
       python: {
         method: 'files.delete',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nclient.files.delete(\n    "collection_id",\n)',
       },
-      typescript: {
-        method: 'client.files.delete',
+      go: {
+        method: 'client.Files.Delete',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nawait client.files.delete('collection_id');",
+          'package main\n\nimport (\n\t"context"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\terr := client.Files.Delete(context.TODO(), "collection_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n}\n',
+      },
+      cli: {
+        method: 'files delete',
+        example: "anyformat files delete \\\n  --api-key 'My API Key' \\\n  --collection-id collection_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/files/$COLLECTION_ID/ \\\n    -X DELETE \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -257,28 +257,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## create\n\n`client.workflows.create(): { id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n\n**post** `/v2/workflows/`\n\nCreate a new extraction workflow.\n\nWorkflows define what data to extract from documents. After creating a workflow,\nconfigure its extraction fields in the [AnyFormat dashboard](https://app.anyformat.ai).\n\n### Returns\n\n- `{ id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n  A workflow defines the extraction template — what fields to extract from documents, their types, and validation rules.\n\n  - `id: string`\n  - `name: string`\n  - `created_at?: string`\n  - `description?: string`\n  - `fields?: object[]`\n  - `updated_at?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflow = await client.workflows.create();\n\nconsole.log(workflow);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows create',
-        example: "anyformat workflows create \\\n  --api-key 'My API Key'",
-      },
-      go: {
-        method: 'client.Workflows.New',
+      typescript: {
+        method: 'client.workflows.create',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tworkflow, err := client.Workflows.New(context.TODO())\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflow.ID)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -X POST \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst workflow = await client.workflows.create();\n\nconsole.log(workflow.id);",
       },
       python: {
         method: 'workflows.create',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nworkflow = client.workflows.create()\nprint(workflow.id)',
       },
-      typescript: {
-        method: 'client.workflows.create',
+      go: {
+        method: 'client.Workflows.New',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst workflow = await client.workflows.create();\n\nconsole.log(workflow.id);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tworkflow, err := client.Workflows.New(context.TODO())\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflow.ID)\n}\n',
+      },
+      cli: {
+        method: 'workflows create',
+        example: "anyformat workflows create \\\n  --api-key 'My API Key'",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -X POST \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -303,28 +303,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## list\n\n`client.workflows.list(order?: string, page?: number, page_size?: number, sort_by?: string, status?: string): { count: number; page: number; page_size: number; results: workflow[]; }`\n\n**get** `/v2/workflows/`\n\nList all workflows in your organization with pagination.\n\nWorkflows can be filtered by status and sorted by any field.\n\n### Parameters\n\n- `order?: string`\n\n- `page?: number`\n\n- `page_size?: number`\n\n- `sort_by?: string`\n\n- `status?: string`\n\n### Returns\n\n- `{ count: number; page: number; page_size: number; results: { id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }[]; }`\n  Paginated list of workflows.\n\n  - `count: number`\n  - `page: number`\n  - `page_size: number`\n  - `results: { id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }[]`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflows = await client.workflows.list();\n\nconsole.log(workflows);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows list',
-        example: "anyformat workflows list \\\n  --api-key 'My API Key'",
-      },
-      go: {
-        method: 'client.Workflows.List',
+      typescript: {
+        method: 'client.workflows.list',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tworkflows, err := client.Workflows.List(context.TODO(), anyformat.WorkflowListParams{})\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflows.Count)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst workflows = await client.workflows.list();\n\nconsole.log(workflows.count);",
       },
       python: {
         method: 'workflows.list',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nworkflows = client.workflows.list()\nprint(workflows.count)',
       },
-      typescript: {
-        method: 'client.workflows.list',
+      go: {
+        method: 'client.Workflows.List',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst workflows = await client.workflows.list();\n\nconsole.log(workflows.count);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tworkflows, err := client.Workflows.List(context.TODO(), anyformat.WorkflowListParams{})\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflows.Count)\n}\n',
+      },
+      cli: {
+        method: 'workflows list',
+        example: "anyformat workflows list \\\n  --api-key 'My API Key'",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -342,28 +342,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## retrieve\n\n`client.workflows.retrieve(workflow_id: string): { id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n\n**get** `/v2/workflows/{workflow_id}/`\n\nRetrieve a single workflow by its ID, including its configured extraction fields.\n\n### Parameters\n\n- `workflow_id: string`\n\n### Returns\n\n- `{ id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n  A workflow defines the extraction template — what fields to extract from documents, their types, and validation rules.\n\n  - `id: string`\n  - `name: string`\n  - `created_at?: string`\n  - `description?: string`\n  - `fields?: object[]`\n  - `updated_at?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflow = await client.workflows.retrieve('workflow_id');\n\nconsole.log(workflow);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows retrieve',
-        example: "anyformat workflows retrieve \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
-      },
-      go: {
-        method: 'client.Workflows.Get',
+      typescript: {
+        method: 'client.workflows.retrieve',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tworkflow, err := client.Workflows.Get(context.TODO(), "workflow_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflow.ID)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst workflow = await client.workflows.retrieve('workflow_id');\n\nconsole.log(workflow.id);",
       },
       python: {
         method: 'workflows.retrieve',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nworkflow = client.workflows.retrieve(\n    "workflow_id",\n)\nprint(workflow.id)',
       },
-      typescript: {
-        method: 'client.workflows.retrieve',
+      go: {
+        method: 'client.Workflows.Get',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst workflow = await client.workflows.retrieve('workflow_id');\n\nconsole.log(workflow.id);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tworkflow, err := client.Workflows.Get(context.TODO(), "workflow_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflow.ID)\n}\n',
+      },
+      cli: {
+        method: 'workflows retrieve',
+        example: "anyformat workflows retrieve \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -380,28 +380,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## delete\n\n`client.workflows.delete(workflow_id: string): void`\n\n**delete** `/v2/workflows/{workflow_id}/`\n\nDelete a workflow and all associated file collections and extraction results.\n\nThis action is irreversible.\n\n### Parameters\n\n- `workflow_id: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nawait client.workflows.delete('workflow_id')\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows delete',
-        example: "anyformat workflows delete \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
-      },
-      go: {
-        method: 'client.Workflows.Delete',
+      typescript: {
+        method: 'client.workflows.delete',
         example:
-          'package main\n\nimport (\n\t"context"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\terr := client.Workflows.Delete(context.TODO(), "workflow_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/ \\\n    -X DELETE \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nawait client.workflows.delete('workflow_id');",
       },
       python: {
         method: 'workflows.delete',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nclient.workflows.delete(\n    "workflow_id",\n)',
       },
-      typescript: {
-        method: 'client.workflows.delete',
+      go: {
+        method: 'client.Workflows.Delete',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nawait client.workflows.delete('workflow_id');",
+          'package main\n\nimport (\n\t"context"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\terr := client.Workflows.Delete(context.TODO(), "workflow_id")\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n}\n',
+      },
+      cli: {
+        method: 'workflows delete',
+        example: "anyformat workflows delete \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/ \\\n    -X DELETE \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -419,28 +419,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## run\n\n`client.workflows.run(workflow_id: string, file?: string, text?: string): { id: string; status: string; workflow_id: string; }`\n\n**post** `/v2/workflows/{workflow_id}/run/`\n\nUpload a file and immediately run the extraction workflow on it.\n\nThis is the primary endpoint for document extraction. It creates a file collection,\nuploads the file, and starts extraction in one step. The response includes a collection\n`id` that you can use to poll for results via\n`GET /v2/workflows/{workflow_id}/files/{collection_id}/results/`.\n\nProvide the file as a binary upload in the `file` field, or send raw text in the\n`text` field for text-only extraction.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `file?: string`\n\n- `text?: string`\n\n### Returns\n\n- `{ id: string; status: string; workflow_id: string; }`\n  Response after triggering a workflow run. Contains the collection ID to use for polling extraction results.\n\n  - `id: string`\n  - `status: string`\n  - `workflow_id: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.run('workflow_id');\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows run',
-        example: "anyformat workflows run \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
-      },
-      go: {
-        method: 'client.Workflows.Run',
+      typescript: {
+        method: 'client.workflows.run',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.Run(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowRunParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.ID)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/run/ \\\n    -X POST \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.run('workflow_id');\n\nconsole.log(response.id);",
       },
       python: {
         method: 'workflows.run',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.run(\n    workflow_id="workflow_id",\n)\nprint(response.id)',
       },
-      typescript: {
-        method: 'client.workflows.run',
+      go: {
+        method: 'client.Workflows.Run',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.run('workflow_id');\n\nconsole.log(response.id);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.Run(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowRunParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.ID)\n}\n',
+      },
+      cli: {
+        method: 'workflows run',
+        example: "anyformat workflows run \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/run/ \\\n    -X POST \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -458,28 +458,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## upload\n\n`client.workflows.upload(workflow_id: string, file?: string, text?: string): { status: string; filename?: string; }`\n\n**post** `/v2/workflows/{workflow_id}/upload/`\n\nUpload a file to a workflow without running extraction.\n\nUse this when you want to stage files for later processing. For upload-and-extract\nin one step, use `POST /v2/workflows/{workflow_id}/run/` instead.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `file?: string`\n\n- `text?: string`\n\n### Returns\n\n- `{ status: string; filename?: string; }`\n  Confirmation that a file was uploaded successfully without triggering extraction.\n\n  - `status: string`\n  - `filename?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.upload('workflow_id');\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows upload',
-        example: "anyformat workflows upload \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
-      },
-      go: {
-        method: 'client.Workflows.Upload',
+      typescript: {
+        method: 'client.workflows.upload',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.Upload(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowUploadParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Status)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/upload/ \\\n    -X POST \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.upload('workflow_id');\n\nconsole.log(response.status);",
       },
       python: {
         method: 'workflows.upload',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.upload(\n    workflow_id="workflow_id",\n)\nprint(response.status)',
       },
-      typescript: {
-        method: 'client.workflows.upload',
+      go: {
+        method: 'client.Workflows.Upload',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.upload('workflow_id');\n\nconsole.log(response.status);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.Upload(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowUploadParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Status)\n}\n',
+      },
+      cli: {
+        method: 'workflows upload',
+        example: "anyformat workflows upload \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/upload/ \\\n    -X POST \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -498,28 +498,28 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## list_runs\n\n`client.workflows.listRuns(workflow_id: string, page?: number, page_size?: number): { count: number; page: number; page_size: number; results: object[]; }`\n\n**get** `/v2/workflows/{workflow_id}/runs/`\n\nList all extraction runs for a workflow with pagination.\n\nEach run corresponds to a file collection that was processed by the workflow.\nUse the run's `id` (collection UUID) with\n`GET /v2/workflows/{workflow_id}/files/{id}/results/` to fetch detailed results.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `page?: number`\n\n- `page_size?: number`\n\n### Returns\n\n- `{ count: number; page: number; page_size: number; results: { id: string; status: string; created_at?: string; updated_at?: string; }[]; }`\n  Paginated list of workflow runs.\n\n  - `count: number`\n  - `page: number`\n  - `page_size: number`\n  - `results: { id: string; status: string; created_at?: string; updated_at?: string; }[]`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.listRuns('workflow_id');\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows list_runs',
-        example: "anyformat workflows list-runs \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
-      },
-      go: {
-        method: 'client.Workflows.ListRuns',
+      typescript: {
+        method: 'client.workflows.listRuns',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.ListRuns(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowListRunsParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Count)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/runs/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.listRuns('workflow_id');\n\nconsole.log(response.count);",
       },
       python: {
         method: 'workflows.list_runs',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.list_runs(\n    workflow_id="workflow_id",\n)\nprint(response.count)',
       },
-      typescript: {
-        method: 'client.workflows.listRuns',
+      go: {
+        method: 'client.Workflows.ListRuns',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.listRuns('workflow_id');\n\nconsole.log(response.count);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.ListRuns(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowListRunsParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Count)\n}\n',
+      },
+      cli: {
+        method: 'workflows list_runs',
+        example: "anyformat workflows list-runs \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/runs/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -538,29 +538,29 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## list_files\n\n`client.workflows.listFiles(workflow_id: string, page?: number, page_size?: number): { count: number; page: number; page_size: number; results: object[]; }`\n\n**get** `/v2/workflows/{workflow_id}/files/`\n\nList file collections for a workflow.\n\nA file collection groups one or more uploaded files together. Each collection\nhas a status indicating the extraction progress: `pending`, `processing`,\n`completed`, or `failed`.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `page?: number`\n\n- `page_size?: number`\n\n### Returns\n\n- `{ count: number; page: number; page_size: number; results: { id: string; status: string; created_at?: string; name?: string; updated_at?: string; }[]; }`\n\n  - `count: number`\n  - `page: number`\n  - `page_size: number`\n  - `results: { id: string; status: string; created_at?: string; name?: string; updated_at?: string; }[]`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.listFiles('workflow_id');\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows list_files',
+      typescript: {
+        method: 'client.workflows.listFiles',
         example:
-          "anyformat workflows list-files \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
-      },
-      go: {
-        method: 'client.Workflows.ListFiles',
-        example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.ListFiles(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowListFilesParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Count)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/files/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.listFiles('workflow_id');\n\nconsole.log(response.count);",
       },
       python: {
         method: 'workflows.list_files',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.list_files(\n    workflow_id="workflow_id",\n)\nprint(response.count)',
       },
-      typescript: {
-        method: 'client.workflows.listFiles',
+      go: {
+        method: 'client.Workflows.ListFiles',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.listFiles('workflow_id');\n\nconsole.log(response.count);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.ListFiles(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowListFilesParams{},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.Count)\n}\n',
+      },
+      cli: {
+        method: 'workflows list_files',
+        example:
+          "anyformat workflows list-files \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/files/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
@@ -579,29 +579,29 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## create_file\n\n`client.workflows.createFile(workflow_id: string, files: string[]): { id: string; files: object[]; workflow_id: string; name?: string; }`\n\n**post** `/v2/workflows/{workflow_id}/files/`\n\nUpload one or more files to a workflow, creating a new file collection.\n\nUse this when you want to upload files without immediately running extraction.\nTo upload and extract in one step, use `POST /v2/workflows/{workflow_id}/run/` instead.\n\nSupported file types: PDF, PNG, JPG, TIFF, TXT, DOCX, XLSX, CSV, and more.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `files: string[]`\n\n### Returns\n\n- `{ id: string; files: { filename: string; status: string; }[]; workflow_id: string; name?: string; }`\n  Response from creating a file collection. Contains the collection ID and the status of each uploaded file.\n\n  - `id: string`\n  - `files: { filename: string; status: string; }[]`\n  - `workflow_id: string`\n  - `name?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.createFile('workflow_id', { files: ['string'] });\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows create_file',
+      typescript: {
+        method: 'client.workflows.createFile',
         example:
-          "anyformat workflows create-file \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id \\\n  --file string",
-      },
-      go: {
-        method: 'client.Workflows.NewFile',
-        example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.NewFile(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowNewFileParams{\n\t\t\tFiles: []string{"string"},\n\t\t},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.ID)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/files/ \\\n    -H \'Content-Type: multipart/form-data\' \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY" \\\n    -F files=\'["string"]\'',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.createFile('workflow_id', { files: ['string'] });\n\nconsole.log(response.id);",
       },
       python: {
         method: 'workflows.create_file',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.create_file(\n    workflow_id="workflow_id",\n    files=["string"],\n)\nprint(response.id)',
       },
-      typescript: {
-        method: 'client.workflows.createFile',
+      go: {
+        method: 'client.Workflows.NewFile',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.createFile('workflow_id', { files: ['string'] });\n\nconsole.log(response.id);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.NewFile(\n\t\tcontext.TODO(),\n\t\t"workflow_id",\n\t\tanyformat.WorkflowNewFileParams{\n\t\t\tFiles: []string{"string"},\n\t\t},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response.ID)\n}\n',
+      },
+      cli: {
+        method: 'workflows create_file',
+        example:
+          "anyformat workflows create-file \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id \\\n  --file string",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/files/ \\\n    -H \'Content-Type: multipart/form-data\' \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY" \\\n    -F files=\'["string"]\'',
       },
     },
   },
@@ -619,29 +619,29 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     markdown:
       "## get_file_results\n\n`client.workflows.getFileResults(workflow_id: string, collection_id: string): object`\n\n**get** `/v2/workflows/{workflow_id}/files/{collection_id}/results/`\n\nRetrieve the extraction results for a file collection.\n\nReturns the structured data extracted from each file, including field values,\nconfidence scores, and source evidence (text excerpts and page numbers). Also\nincludes a `verification_url` linking to the AnyFormat dashboard for human review.\n\nReturns **412 Precondition Failed** if the extraction is still in progress. Poll\nthis endpoint until you receive a 200 response, or use webhooks\n(`extraction.completed` event) to be notified when processing finishes.\n\n### Parameters\n\n- `workflow_id: string`\n\n- `collection_id: string`\n\n### Returns\n\n- `object`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst response = await client.workflows.getFileResults('collection_id', { workflow_id: 'workflow_id' });\n\nconsole.log(response);\n```",
     perLanguage: {
-      cli: {
-        method: 'workflows get_file_results',
+      typescript: {
+        method: 'client.workflows.getFileResults',
         example:
-          "anyformat workflows get-file-results \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id \\\n  --collection-id collection_id",
-      },
-      go: {
-        method: 'client.Workflows.GetFileResults',
-        example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.GetFileResults(\n\t\tcontext.TODO(),\n\t\t"collection_id",\n\t\tanyformat.WorkflowGetFileResultsParams{\n\t\t\tWorkflowID: "workflow_id",\n\t\t},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response)\n}\n',
-      },
-      http: {
-        example:
-          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/files/$COLLECTION_ID/results/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.getFileResults('collection_id', {\n  workflow_id: 'workflow_id',\n});\n\nconsole.log(response);",
       },
       python: {
         method: 'workflows.get_file_results',
         example:
           'import os\nfrom anyformat import Anyformat\n\nclient = Anyformat(\n    api_key=os.environ.get("ANYFORMAT_API_KEY"),  # This is the default and can be omitted\n)\nresponse = client.workflows.get_file_results(\n    collection_id="collection_id",\n    workflow_id="workflow_id",\n)\nprint(response)',
       },
-      typescript: {
-        method: 'client.workflows.getFileResults',
+      go: {
+        method: 'client.Workflows.GetFileResults',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat({\n  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted\n});\n\nconst response = await client.workflows.getFileResults('collection_id', {\n  workflow_id: 'workflow_id',\n});\n\nconsole.log(response);",
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n\t"github.com/anyformat-ai/anyformat-go/option"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient(\n\t\toption.WithAPIKey("My API Key"),\n\t)\n\tresponse, err := client.Workflows.GetFileResults(\n\t\tcontext.TODO(),\n\t\t"collection_id",\n\t\tanyformat.WorkflowGetFileResultsParams{\n\t\t\tWorkflowID: "workflow_id",\n\t\t},\n\t)\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", response)\n}\n',
+      },
+      cli: {
+        method: 'workflows get_file_results',
+        example:
+          "anyformat workflows get-file-results \\\n  --api-key 'My API Key' \\\n  --workflow-id workflow_id \\\n  --collection-id collection_id",
+      },
+      http: {
+        example:
+          'curl https://api.anyformat.ai/v2/workflows/$WORKFLOW_ID/files/$COLLECTION_ID/results/ \\\n    -H "Authorization: Bearer $ANYFORMAT_API_KEY"',
       },
     },
   },
