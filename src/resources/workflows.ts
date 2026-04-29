@@ -14,40 +14,66 @@ export class Workflows extends APIResource {
    * Workflows define what data to extract from documents. After creating a workflow,
    * configure its extraction fields in the
    * [AnyFormat dashboard](https://app.anyformat.ai).
+   *
+   * @example
+   * ```ts
+   * const workflow = await client.workflows.create({
+   *   fields: [{ data_type: 'bar', name: 'bar' }],
+   *   name: 'Invoice Processing',
+   * });
+   * ```
    */
-  create(options?: RequestOptions): APIPromise<Workflow> {
-    return this._client.post('/v2/workflows/', options);
+  create(body: WorkflowCreateParams, options?: RequestOptions): APIPromise<Workflow> {
+    return this._client.post('/v2/workflows/', { body, ...options, __security: {} });
   }
 
   /**
    * Retrieve a single workflow by its ID, including its configured extraction
    * fields.
+   *
+   * @example
+   * ```ts
+   * const workflow = await client.workflows.retrieve(
+   *   'workflow_id',
+   * );
+   * ```
    */
   retrieve(workflowID: string, options?: RequestOptions): APIPromise<Workflow> {
-    return this._client.get(path`/v2/workflows/${workflowID}/`, options);
+    return this._client.get(path`/v2/workflows/${workflowID}/`, { ...options, __security: {} });
   }
 
   /**
    * List all workflows in your organization with pagination.
    *
    * Workflows can be filtered by status and sorted by any field.
+   *
+   * @example
+   * ```ts
+   * const workflows = await client.workflows.list();
+   * ```
    */
   list(
     query: WorkflowListParams | null | undefined = {},
     options?: RequestOptions,
   ): APIPromise<WorkflowListResponse> {
-    return this._client.get('/v2/workflows/', { query, ...options });
+    return this._client.get('/v2/workflows/', { query, ...options, __security: {} });
   }
 
   /**
    * Delete a workflow and all associated file collections and extraction results.
    *
    * This action is irreversible.
+   *
+   * @example
+   * ```ts
+   * await client.workflows.delete('workflow_id');
+   * ```
    */
   delete(workflowID: string, options?: RequestOptions): APIPromise<void> {
     return this._client.delete(path`/v2/workflows/${workflowID}/`, {
       ...options,
       headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
+      __security: {},
     });
   }
 
@@ -59,6 +85,14 @@ export class Workflows extends APIResource {
    * instead.
    *
    * Supported file types: PDF, PNG, JPG, TIFF, TXT, DOCX, XLSX, CSV, and more.
+   *
+   * @example
+   * ```ts
+   * const response = await client.workflows.createFile(
+   *   'workflow_id',
+   *   { files: ['string'] },
+   * );
+   * ```
    */
   createFile(
     workflowID: string,
@@ -67,7 +101,7 @@ export class Workflows extends APIResource {
   ): APIPromise<WorkflowCreateFileResponse> {
     return this._client.post(
       path`/v2/workflows/${workflowID}/files/`,
-      multipartFormRequestOptions({ body, ...options }, this._client),
+      multipartFormRequestOptions({ body, ...options, __security: {} }, this._client),
     );
   }
 
@@ -82,6 +116,14 @@ export class Workflows extends APIResource {
    * Returns **412 Precondition Failed** if the extraction is still in progress. Poll
    * this endpoint until you receive a 200 response, or use webhooks
    * (`extraction.completed` event) to be notified when processing finishes.
+   *
+   * @example
+   * ```ts
+   * const response = await client.workflows.getFileResults(
+   *   'collection_id',
+   *   { workflow_id: 'workflow_id' },
+   * );
+   * ```
    */
   getFileResults(
     collectionID: string,
@@ -89,7 +131,10 @@ export class Workflows extends APIResource {
     options?: RequestOptions,
   ): APIPromise<WorkflowGetFileResultsResponse> {
     const { workflow_id } = params;
-    return this._client.get(path`/v2/workflows/${workflow_id}/files/${collectionID}/results/`, options);
+    return this._client.get(path`/v2/workflows/${workflow_id}/files/${collectionID}/results/`, {
+      ...options,
+      __security: {},
+    });
   }
 
   /**
@@ -98,13 +143,20 @@ export class Workflows extends APIResource {
    * A file collection groups one or more uploaded files together. Each collection
    * has a status indicating the extraction progress: `pending`, `processing`,
    * `completed`, or `failed`.
+   *
+   * @example
+   * ```ts
+   * const response = await client.workflows.listFiles(
+   *   'workflow_id',
+   * );
+   * ```
    */
   listFiles(
     workflowID: string,
     query: WorkflowListFilesParams | null | undefined = {},
     options?: RequestOptions,
   ): APIPromise<WorkflowListFilesResponse> {
-    return this._client.get(path`/v2/workflows/${workflowID}/files/`, { query, ...options });
+    return this._client.get(path`/v2/workflows/${workflowID}/files/`, { query, ...options, __security: {} });
   }
 
   /**
@@ -113,13 +165,20 @@ export class Workflows extends APIResource {
    * Each run corresponds to a file collection that was processed by the workflow.
    * Use the run's `id` (collection UUID) with
    * `GET /v2/workflows/{workflow_id}/files/{id}/results/` to fetch detailed results.
+   *
+   * @example
+   * ```ts
+   * const response = await client.workflows.listRuns(
+   *   'workflow_id',
+   * );
+   * ```
    */
   listRuns(
     workflowID: string,
     query: WorkflowListRunsParams | null | undefined = {},
     options?: RequestOptions,
   ): APIPromise<WorkflowListRunsResponse> {
-    return this._client.get(path`/v2/workflows/${workflowID}/runs/`, { query, ...options });
+    return this._client.get(path`/v2/workflows/${workflowID}/runs/`, { query, ...options, __security: {} });
   }
 
   /**
@@ -132,6 +191,11 @@ export class Workflows extends APIResource {
    *
    * Provide the file as a binary upload in the `file` field, or send raw text in the
    * `text` field for text-only extraction.
+   *
+   * @example
+   * ```ts
+   * const response = await client.workflows.run('workflow_id');
+   * ```
    */
   run(
     workflowID: string,
@@ -140,7 +204,7 @@ export class Workflows extends APIResource {
   ): APIPromise<WorkflowRunResponse> {
     return this._client.post(
       path`/v2/workflows/${workflowID}/run/`,
-      multipartFormRequestOptions({ body, ...options }, this._client),
+      multipartFormRequestOptions({ body, ...options, __security: {} }, this._client),
     );
   }
 
@@ -150,6 +214,13 @@ export class Workflows extends APIResource {
    * Use this when you want to stage files for later processing. For
    * upload-and-extract in one step, use `POST /v2/workflows/{workflow_id}/run/`
    * instead.
+   *
+   * @example
+   * ```ts
+   * const response = await client.workflows.upload(
+   *   'workflow_id',
+   * );
+   * ```
    */
   upload(
     workflowID: string,
@@ -158,7 +229,7 @@ export class Workflows extends APIResource {
   ): APIPromise<WorkflowUploadResponse> {
     return this._client.post(
       path`/v2/workflows/${workflowID}/upload/`,
-      multipartFormRequestOptions({ body, ...options }, this._client),
+      multipartFormRequestOptions({ body, ...options, __security: {} }, this._client),
     );
   }
 }
@@ -574,6 +645,23 @@ export interface WorkflowUploadResponse {
   filename?: string | null;
 }
 
+export interface WorkflowCreateParams {
+  /**
+   * Field definitions
+   */
+  fields: Array<{ [key: string]: unknown }>;
+
+  /**
+   * Workflow name
+   */
+  name: string;
+
+  /**
+   * Workflow description
+   */
+  description?: string | null;
+}
+
 export interface WorkflowListParams {
   order?: string | null;
 
@@ -628,6 +716,7 @@ export declare namespace Workflows {
     type WorkflowListRunsResponse as WorkflowListRunsResponse,
     type WorkflowRunResponse as WorkflowRunResponse,
     type WorkflowUploadResponse as WorkflowUploadResponse,
+    type WorkflowCreateParams as WorkflowCreateParams,
     type WorkflowListParams as WorkflowListParams,
     type WorkflowCreateFileParams as WorkflowCreateFileParams,
     type WorkflowGetFileResultsParams as WorkflowGetFileResultsParams,
