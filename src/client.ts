@@ -29,6 +29,7 @@ import {
   Workflow,
   WorkflowCreateFileParams,
   WorkflowCreateFileResponse,
+  WorkflowCreateParams,
   WorkflowGetFileResultsParams,
   WorkflowGetFileResultsResponse,
   WorkflowListFilesParams,
@@ -247,7 +248,14 @@ export class Anyformat {
     );
   }
 
-  protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+  protected async authHeaders(
+    opts: FinalRequestOptions,
+    schemes: { bearerAuth?: boolean },
+  ): Promise<NullableHeaders | undefined> {
+    return buildHeaders([schemes.bearerAuth ? await this.bearerAuth(opts) : null]);
+  }
+
+  protected async bearerAuth(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
     if (this.apiKey == null) {
       return undefined;
     }
@@ -680,7 +688,7 @@ export class Anyformat {
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
       },
-      await this.authHeaders(options),
+      await this.authHeaders(options, options.__security ?? { bearerAuth: true }),
       this._options.defaultHeaders,
       bodyHeaders,
       options.headers,
@@ -805,6 +813,7 @@ export declare namespace Anyformat {
     type WorkflowListRunsResponse as WorkflowListRunsResponse,
     type WorkflowRunResponse as WorkflowRunResponse,
     type WorkflowUploadResponse as WorkflowUploadResponse,
+    type WorkflowCreateParams as WorkflowCreateParams,
     type WorkflowListParams as WorkflowListParams,
     type WorkflowCreateFileParams as WorkflowCreateFileParams,
     type WorkflowGetFileResultsParams as WorkflowGetFileResultsParams,

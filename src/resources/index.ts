@@ -18,6 +18,7 @@ export {
   type WorkflowListRunsResponse,
   type WorkflowRunResponse,
   type WorkflowUploadResponse,
+  type WorkflowCreateParams,
   type WorkflowListParams,
   type WorkflowCreateFileParams,
   type WorkflowGetFileResultsParams,

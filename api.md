@@ -42,7 +42,7 @@ Types:
 
 Methods:
 
-- <code title="post /v2/workflows/">client.workflows.<a href="./src/resources/workflows.ts">create</a>() -> Workflow</code>
+- <code title="post /v2/workflows/">client.workflows.<a href="./src/resources/workflows.ts">create</a>({ ...params }) -> Workflow</code>
 - <code title="get /v2/workflows/{workflow_id}/">client.workflows.<a href="./src/resources/workflows.ts">retrieve</a>(workflowID) -> Workflow</code>
 - <code title="get /v2/workflows/">client.workflows.<a href="./src/resources/workflows.ts">list</a>({ ...params }) -> WorkflowListResponse</code>
 - <code title="delete /v2/workflows/{workflow_id}/">client.workflows.<a href="./src/resources/workflows.ts">delete</a>(workflowID) -> void</code>

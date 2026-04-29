@@ -20,6 +20,7 @@ export class Files extends APIResource {
     return this._client.delete(path`/v2/files/${collectionID}/`, {
       ...options,
       headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
+      __security: {},
     });
   }
 }

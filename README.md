@@ -31,9 +31,7 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Anyformat from 'anyformat-ai';
 
-const client = new Anyformat({
-  apiKey: process.env['ANYFORMAT_API_KEY'], // This is the default and can be omitted
-});
+const client = new Anyformat();
 
 const response = await client.workflows.run('0686bb97-8c30-70f0-8000-97669e000eb8', {
   text: 'Invoice #12345\nDate: 2025-01-15\nAmount: $1,250.00\nVendor: Acme Corp',
