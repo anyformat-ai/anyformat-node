@@ -30,7 +30,7 @@ export class Webhooks extends APIResource {
    * ```
    */
   create(body: WebhookCreateParams, options?: RequestOptions): APIPromise<WebhookCreateResponse> {
-    return this._client.post('/v2/webhooks/', { body, ...options });
+    return this._client.post('/v2/webhooks/', { body, ...options, __security: {} });
   }
 
   /**
@@ -45,7 +45,7 @@ export class Webhooks extends APIResource {
    * ```
    */
   list(options?: RequestOptions): APIPromise<WebhookListResponse> {
-    return this._client.get('/v2/webhooks/', options);
+    return this._client.get('/v2/webhooks/', { ...options, __security: {} });
   }
 
   /**
@@ -63,6 +63,7 @@ export class Webhooks extends APIResource {
     return this._client.delete(path`/v2/webhooks/${webhookID}/`, {
       ...options,
       headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
+      __security: {},
     });
   }
 }

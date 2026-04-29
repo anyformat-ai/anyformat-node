@@ -9,8 +9,11 @@ const client = new Anyformat({
 
 describe('resource workflows', () => {
   // Mock server tests are disabled
-  test.skip('create', async () => {
-    const responsePromise = client.workflows.create();
+  test.skip('create: only required params', async () => {
+    const responsePromise = client.workflows.create({
+      fields: [{ data_type: 'bar', name: 'bar' }],
+      name: 'Invoice Processing',
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -18,6 +21,15 @@ describe('resource workflows', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Mock server tests are disabled
+  test.skip('create: required and optional params', async () => {
+    const response = await client.workflows.create({
+      fields: [{ data_type: 'bar', name: 'bar' }],
+      name: 'Invoice Processing',
+      description: 'Extracts invoice number, vendor, total, and line items.',
+    });
   });
 
   // Mock server tests are disabled
