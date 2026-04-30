@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import Anyformat from 'anyformat-ai';
+import Anyformat from 'anyformat-node';
 
 const client = new Anyformat({
   apiKey: 'My API Key',
