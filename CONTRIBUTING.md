@@ -55,12 +55,12 @@ $ cd anyformat-node
 # With yarn
 $ yarn link
 $ cd ../my-package
-$ yarn link anyformat-node
+$ yarn link @anyformat/anyformat-ai
 
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link --global anyformat-node
+$ pnpm link --global @anyformat/anyformat-ai
 ```
 
 ## Running tests

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import Anyformat from 'anyformat-node';
+import Anyformat from '@anyformat/anyformat-ai';
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 
 type TextContentBlock = {

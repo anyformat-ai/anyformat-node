@@ -4,7 +4,7 @@ const parentPkgJson = require('../../../package.json');
 
 for (const dep in pkgJson.dependencies) {
   // ensure we point to NPM instead of a local directory
-  if (dep === 'anyformat-node') {
+  if (dep === '@anyformat/anyformat-ai') {
     pkgJson.dependencies[dep] = '^' + parentPkgJson.version;
   }
 }
