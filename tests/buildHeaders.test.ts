@@ -1,5 +1,5 @@
 import { inspect } from 'node:util';
-import { buildHeaders, type HeadersLike, type NullableHeaders } from 'anyformat-ai/internal/headers';
+import { buildHeaders, type HeadersLike, type NullableHeaders } from 'anyformat-node/internal/headers';
 
 function inspectNullableHeaders(headers: NullableHeaders) {
   return `NullableHeaders {${[
