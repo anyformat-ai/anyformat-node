@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { stringifyQuery } from '@anyformat/anyformat-ai/internal/utils/query';
+import { stringifyQuery } from 'anyformat-ai/internal/utils/query';
 
 describe(stringifyQuery, () => {
   for (const [input, expected] of [
