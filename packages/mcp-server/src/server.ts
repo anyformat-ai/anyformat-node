@@ -7,8 +7,8 @@ import {
   ListToolsRequestSchema,
   SetLevelRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { ClientOptions } from 'anyformat-ai';
-import Anyformat from 'anyformat-ai';
+import { ClientOptions } from 'anyformat-node';
+import Anyformat from 'anyformat-node';
 import { codeTool } from './code-tool';
 import docsSearchTool from './docs-search-tool';
 import { setLocalSearch } from './docs-search-tool';
@@ -27,7 +27,7 @@ export const newMcpServer = async ({
 }) =>
   new McpServer(
     {
-      name: 'anyformat_ai_api',
+      name: 'anyformat_node_api',
       version: '0.5.0',
     },
     {

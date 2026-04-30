@@ -22,7 +22,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              regex: '^anyformat-ai(/.*)?',
+              regex: '^anyformat-node(/.*)?',
               message: 'Use a relative import, not a package import.',
             },
           ],

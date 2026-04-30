@@ -88,7 +88,7 @@ importers:
       ajv:
         specifier: ^8.18.0
         version: 8.18.0
-      anyformat-ai:
+      anyformat-node:
         specifier: workspace:*
         version: link:../..
       cookie-parser:
