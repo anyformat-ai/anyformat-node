@@ -1,6 +1,6 @@
 {
-  "name": "@anyformat/anyformat-ai",
-  "version": "0.6.0",
+  "name": "anyformat-ai",
+  "version": "0.7.0",
   "description": "The official TypeScript library for the Anyformat API",
   "author": "Anyformat <support@anyformat.ai>",
   "types": "dist/index.d.ts",
