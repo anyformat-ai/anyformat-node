@@ -8,8 +8,8 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "paths": {
-      "@anyformat/anyformat-ai/*": ["./src/*"],
-      "@anyformat/anyformat-ai": ["./src/index.ts"]
+      "anyformat-ai/*": ["./src/*"],
+      "anyformat-ai": ["./src/index.ts"]
     },
     "noEmit": true,
 
