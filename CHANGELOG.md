@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0 (2026-04-30)
+
+Full Changelog: [v0.5.0...v0.6.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.5.0...v0.6.0)
+
+### Features
+
+* **api:** api update ([884d409](https://github.com/anyformat-ai/anyformat-node/commit/884d4093f0b1ace2ba7d728448c46773c87e903f))
+* **api:** api update ([e26cfd2](https://github.com/anyformat-ai/anyformat-node/commit/e26cfd271e21c449629af56634e3adc3622c85ed))
+
+
+### Chores
+
+* **format:** run eslint and prettier separately ([ad23fb0](https://github.com/anyformat-ai/anyformat-node/commit/ad23fb062b6aed12cba1ae8f0bf1faa33f20971b))
+* update SDK settings ([c749555](https://github.com/anyformat-ai/anyformat-node/commit/c749555326f04e0e887e98c43ace8d4f6377f274))
+
 ## 0.5.0 (2026-04-28)
 
 Full Changelog: [v0.4.0...v0.5.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.4.0...v0.5.0)
