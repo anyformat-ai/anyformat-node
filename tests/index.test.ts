@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIPromise } from 'anyformat-node/core/api-promise';
+import { APIPromise } from '@anyformat/anyformat-ai/core/api-promise';
 
 import util from 'node:util';
-import Anyformat from 'anyformat-node';
-import { APIUserAbortError } from 'anyformat-node';
+import Anyformat from '@anyformat/anyformat-ai';
+import { APIUserAbortError } from '@anyformat/anyformat-ai';
 const defaultFetch = fetch;
 
 describe('instantiate client', () => {

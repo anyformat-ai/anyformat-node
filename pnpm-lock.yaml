@@ -73,6 +73,9 @@ importers:
 
   packages/mcp-server:
     dependencies:
+      '@anyformat/anyformat-ai':
+        specifier: workspace:*
+        version: link:../..
       '@cloudflare/cabidela':
         specifier: ^0.2.4
         version: 0.2.4
@@ -88,9 +91,6 @@ importers:
       ajv:
         specifier: ^8.18.0
         version: 8.18.0
-      anyformat-node:
-        specifier: workspace:*
-        version: link:../..
       cookie-parser:
         specifier: ^1.4.6
         version: 1.4.7

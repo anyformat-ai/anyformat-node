@@ -5,8 +5,8 @@
   "compilerOptions": {
     "rootDir": "./dist/src",
     "paths": {
-      "anyformat-node/*": ["./dist/src/*"],
-      "anyformat-node": ["./dist/src/index.ts"]
+      "@anyformat/anyformat-ai/*": ["./dist/src/*"],
+      "@anyformat/anyformat-ai": ["./dist/src/index.ts"]
     },
     "noEmit": false,
     "declaration": true,
