@@ -5,7 +5,7 @@ import util from 'node:util';
 import Fuse from 'fuse.js';
 import ts from 'typescript';
 import { WorkerOutput } from './code-tool-types';
-import { Anyformat, ClientOptions } from 'anyformat-node';
+import { Anyformat, ClientOptions } from '@anyformat/anyformat-ai';
 
 async function tseval(code: string) {
   return import('data:application/typescript;charset=utf-8;base64,' + Buffer.from(code).toString('base64'));
@@ -57,7 +57,7 @@ function getRunFunctionSource(code: string): {
 function getTSDiagnostics(code: string): string[] {
   const functionSource = getRunFunctionSource(code)!;
   const codeWithImport = [
-    'import { Anyformat } from "anyformat-node";',
+    'import { Anyformat } from "@anyformat/anyformat-ai";',
     functionSource.type === 'declaration' ?
       `async function run(${functionSource.client}: Anyformat)`
     : `const run: (${functionSource.client}: Anyformat) => Promise<unknown> =`,
