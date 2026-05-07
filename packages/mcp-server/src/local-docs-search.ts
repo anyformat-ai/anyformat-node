@@ -124,7 +124,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.anyformat.ai/v2/webhooks/ \\\n    -H \'Content-Type: application/json\' \\\n    -d \'{\n          "url": "https://example.com/webhooks/anyformat"\n        }\'',
+          'curl https://api.anyformat.ai/v2/webhooks/ \\\n    -H \'Content-Type: application/json\' \\\n    -d \'{\n          "url": "https://example.com/webhooks/anyformat",\n          "events": [\n            "extraction.completed",\n            "extraction.failed"\n          ]\n        }\'',
       },
     },
   },
@@ -276,7 +276,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -H \'Content-Type: application/json\' \\\n    -d \'{\n          "fields": [\n            {\n              "data_type": "bar",\n              "name": "bar"\n            }\n          ],\n          "name": "Invoice Processing"\n        }\'',
+          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -H \'Content-Type: application/json\' \\\n    -d \'{\n          "fields": [\n            {\n              "data_type": "bar",\n              "name": "bar"\n            }\n          ],\n          "name": "Invoice Processing",\n          "description": "Extracts invoice number, vendor, total, and line items."\n        }\'',
       },
     },
   },
