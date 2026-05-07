@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.0 (2026-05-07)
+
+Full Changelog: [v0.7.0...v0.8.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.7.0...v0.8.0)
+
+### Features
+
+* **api:** api update ([5aad704](https://github.com/anyformat-ai/anyformat-node/commit/5aad704dd662d2639b068a8760bf26915bc3ec01))
+* **api:** api update ([d32f12c](https://github.com/anyformat-ai/anyformat-node/commit/d32f12c9181a18b79c39c21b32297191b7dc41e7))
+
+
+### Documentation
+
+* update http mcp docs ([c6fc285](https://github.com/anyformat-ai/anyformat-node/commit/c6fc285f868884084840d478993b666041fade0c))
+
 ## 0.7.0 (2026-04-30)
 
 Full Changelog: [v0.6.0...v0.7.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.6.0...v0.7.0)
