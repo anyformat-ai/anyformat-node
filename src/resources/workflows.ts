@@ -113,9 +113,19 @@ export class Workflows extends APIResource {
    * includes a `verification_url` linking to the AnyFormat dashboard for human
    * review.
    *
-   * Returns **412 Precondition Failed** if the extraction is still in progress. Poll
-   * this endpoint until you receive a 200 response, or use webhooks
-   * (`extraction.completed` event) to be notified when processing finishes.
+   * Possible non-200 responses:
+   *
+   * - **412 `PRECONDITION_FAILED`** — extraction still in progress; retry with
+   *   backoff.
+   * - **422 `EXTRACTION_FAILED`** — extraction did not complete successfully;
+   *   terminal. Polling will not transition the collection out of this state.
+   *   Possible next steps: review the document, retry the upload, or open the
+   *   collection in the AnyFormat dashboard for more context.
+   * - **422 `EXTRACTION_CANCELLED`** — extraction was cancelled; terminal. Possible
+   *   next steps: review the document, retry the upload, or open the collection in
+   *   the AnyFormat dashboard.
+   *
+   * Use webhooks (`extraction.completed` event) to avoid polling.
    *
    * @example
    * ```ts
@@ -353,10 +363,14 @@ export interface WorkflowGetFileResultsResponse {
   collection_id: string;
 
   /**
-   * Extracted fields keyed by field name. `null` for parse-only workflows. Always
-   * present in the response. Each value is either a scalar field (`ExtractedField`)
-   * or a list of object-field rows (`list[dict[str, ExtractedField]]`) for compound
-   * fields like line items.
+   * Per-classifier-node verdicts. Empty when the workflow has no classifier.
+   */
+  classifications?: Array<WorkflowGetFileResultsResponse.Classification>;
+
+  /**
+   * @deprecated **Deprecated** — use `extractions` instead. Extracted fields keyed
+   * by field name, populated only for linear workflows (single extract node, no
+   * splitter). `null` for split workflows; read `extractions[]` instead.
    */
   extraction?: {
     [key: string]:
@@ -365,9 +379,22 @@ export interface WorkflowGetFileResultsResponse {
   } | null;
 
   /**
+   * Flat list of extraction datapoints. Linear workflows produce one entry with
+   * `split_name=null` and `partition=null`. Split workflows produce one entry per
+   * (split, partition). Empty when no extraction has run yet.
+   */
+  extractions?: Array<WorkflowGetFileResultsResponse.Extraction>;
+
+  /**
    * Parsed markdown for a file.
    */
   parse?: WorkflowGetFileResultsResponse.Parse | null;
+
+  /**
+   * Splitter output: category-level geometry with optional partitions. Empty when
+   * the workflow has no splitter.
+   */
+  splits?: Array<WorkflowGetFileResultsResponse.Split>;
 
   /**
    * Link to the AnyFormat dashboard for human review of this collection's results.
@@ -378,6 +405,27 @@ export interface WorkflowGetFileResultsResponse {
 }
 
 export namespace WorkflowGetFileResultsResponse {
+  /**
+   * One classifier verdict for the collection.
+   */
+  export interface Classification {
+    /**
+     * The category the document was classified as.
+     */
+    category: string;
+
+    /**
+     * 0-100 model confidence in the verdict.
+     */
+    confidence: number;
+
+    /**
+     * Free-form evidence text (the snippets the classifier cited). `null` when none
+     * captured.
+     */
+    evidence?: string | null;
+  }
+
   /**
    * One extracted field's value, confidence, and supporting evidence.
    */
@@ -479,6 +527,138 @@ export namespace WorkflowGetFileResultsResponse {
        * The exact source-text snippet that supports the extracted value.
        */
       text: string;
+    }
+  }
+
+  /**
+   * One unit of extracted data. For linear (parse->extract) workflows there is
+   * exactly one entry with `split_name=null` and `partition=null`. For split
+   * workflows there is one entry per (split, partition) pair; join with `splits[]`
+   * by `split_name` to look up geometry.
+   */
+  export interface Extraction {
+    /**
+     * Extracted fields keyed by field name. Same shape as the legacy top-level
+     * `extraction`.
+     */
+    fields: {
+      [key: string]: Extraction.ExtractedField | Array<{ [key: string]: Extraction.ExtractedField }>;
+    };
+
+    /**
+     * The partition value within the split. `null` when the split has no partitions.
+     */
+    partition?: string | null;
+
+    /**
+     * The split category this extraction belongs to. `null` for linear workflows.
+     */
+    split_name?: string | null;
+  }
+
+  export namespace Extraction {
+    /**
+     * One extracted field's value, confidence, and supporting evidence.
+     */
+    export interface ExtractedField {
+      /**
+       * The extracted value. Type depends on the field's `data_type` (string, number,
+       * date, etc.). `null` when extraction could not produce a value.
+       */
+      value: unknown;
+
+      /**
+       * Model confidence in the extracted value, on a 0-100 scale. `null` when the
+       * backend did not produce a confidence (e.g. manual entry).
+       */
+      confidence?: number | null;
+
+      /**
+       * Source-text snippets the model used to derive this value.
+       */
+      evidence?: Array<ExtractedField.Evidence>;
+
+      /**
+       * A human-supplied override of the extracted `value`, if one was set during
+       * verification. `null` when no override exists.
+       */
+      value_override?: unknown;
+
+      /**
+       * Verification state for this datapoint (e.g. `not_verified`, `verified`). `null`
+       * when not yet reviewed.
+       */
+      verification_status?: string | null;
+    }
+
+    export namespace ExtractedField {
+      /**
+       * A snippet of source text supporting an extracted value, with the page it came
+       * from.
+       */
+      export interface Evidence {
+        /**
+         * 1-indexed page number where the snippet was found.
+         */
+        page_number: number;
+
+        /**
+         * The exact source-text snippet that supports the extracted value.
+         */
+        text: string;
+      }
+    }
+
+    /**
+     * One extracted field's value, confidence, and supporting evidence.
+     */
+    export interface ExtractedField {
+      /**
+       * The extracted value. Type depends on the field's `data_type` (string, number,
+       * date, etc.). `null` when extraction could not produce a value.
+       */
+      value: unknown;
+
+      /**
+       * Model confidence in the extracted value, on a 0-100 scale. `null` when the
+       * backend did not produce a confidence (e.g. manual entry).
+       */
+      confidence?: number | null;
+
+      /**
+       * Source-text snippets the model used to derive this value.
+       */
+      evidence?: Array<ExtractedField.Evidence>;
+
+      /**
+       * A human-supplied override of the extracted `value`, if one was set during
+       * verification. `null` when no override exists.
+       */
+      value_override?: unknown;
+
+      /**
+       * Verification state for this datapoint (e.g. `not_verified`, `verified`). `null`
+       * when not yet reviewed.
+       */
+      verification_status?: string | null;
+    }
+
+    export namespace ExtractedField {
+      /**
+       * A snippet of source text supporting an extracted value, with the page it came
+       * from.
+       */
+      export interface Evidence {
+        /**
+         * 1-indexed page number where the snippet was found.
+         */
+        page_number: number;
+
+        /**
+         * The exact source-text snippet that supports the extracted value.
+         */
+        text: string;
+      }
     }
   }
 
@@ -492,6 +672,91 @@ export namespace WorkflowGetFileResultsResponse {
      * failed.
      */
     markdown: string | null;
+  }
+
+  /**
+   * A category-level split: which pages of which files fall under it, plus any
+   * partitions inside it. Extraction data lives under `extractions[]` — join by
+   * `split_name`.
+   */
+  export interface Split {
+    /**
+     * 0-100 aggregate confidence (min across partitions).
+     */
+    confidence: number;
+
+    /**
+     * Per-file page lists, union of all partitions.
+     */
+    files: Array<Split.File>;
+
+    /**
+     * The split's category name.
+     */
+    name: string;
+
+    partitions?: Array<Split.Partition>;
+  }
+
+  export namespace Split {
+    /**
+     * A file's contribution of pages to a split or partition. 1-indexed.
+     */
+    export interface File {
+      /**
+       * The file's UUID.
+       */
+      file_id: string;
+
+      /**
+       * The file's display name.
+       */
+      file_name: string;
+
+      /**
+       * 1-indexed page numbers from this file.
+       */
+      pages: Array<number>;
+    }
+
+    /**
+     * A partition value within a split (e.g. `1234-5678` under `Account Holdings`).
+     */
+    export interface Partition {
+      /**
+       * 0-100 minimum confidence across the partition's ranges.
+       */
+      confidence: number;
+
+      files: Array<Partition.File>;
+
+      /**
+       * The partition value (free-form string).
+       */
+      name: string;
+    }
+
+    export namespace Partition {
+      /**
+       * A file's contribution of pages to a split or partition. 1-indexed.
+       */
+      export interface File {
+        /**
+         * The file's UUID.
+         */
+        file_id: string;
+
+        /**
+         * The file's display name.
+         */
+        file_name: string;
+
+        /**
+         * 1-indexed page numbers from this file.
+         */
+        pages: Array<number>;
+      }
+    }
   }
 }
 
