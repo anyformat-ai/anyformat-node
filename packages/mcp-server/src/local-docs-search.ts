@@ -252,31 +252,31 @@ const EMBEDDED_METHODS: MethodEntry[] = [
     response:
       '{ id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }',
     markdown:
-      "## create\n\n`client.workflows.create(fields: object[], name: string, description?: string): { id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n\n**post** `/v2/workflows/`\n\nCreate a new extraction workflow.\n\nWorkflows define what data to extract from documents. After creating a workflow,\nconfigure its extraction fields in the [AnyFormat dashboard](https://app.anyformat.ai).\n\n### Parameters\n\n- `fields: object[]`\n  Field definitions\n\n- `name: string`\n  Workflow name\n\n- `description?: string`\n  Workflow description\n\n### Returns\n\n- `{ id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n  A workflow defines the extraction template — what fields to extract from documents, their types, and validation rules.\n\n  - `id: string`\n  - `name: string`\n  - `created_at?: string`\n  - `description?: string`\n  - `fields?: object[]`\n  - `updated_at?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflow = await client.workflows.create({ fields: [{ data_type: 'bar', name: 'bar' }], name: 'Invoice Processing' });\n\nconsole.log(workflow);\n```",
+      "## create\n\n`client.workflows.create(fields: object[], name: string, description?: string): { id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n\n**post** `/v2/workflows/`\n\nCreate a new extraction workflow.\n\nWorkflows define what data to extract from documents. After creating a workflow,\nconfigure its extraction fields in the [AnyFormat dashboard](https://app.anyformat.ai).\n\n### Parameters\n\n- `fields: object[]`\n  Field definitions. Each entry's shape is determined by its `data_type`.\n\n- `name: string`\n  Workflow name\n\n- `description?: string`\n  Workflow description\n\n### Returns\n\n- `{ id: string; name: string; created_at?: string; description?: string; fields?: object[]; updated_at?: string; }`\n  A workflow defines the extraction template — what fields to extract from documents, their types, and validation rules.\n\n  - `id: string`\n  - `name: string`\n  - `created_at?: string`\n  - `description?: string`\n  - `fields?: object[]`\n  - `updated_at?: string`\n\n### Example\n\n```typescript\nimport Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflow = await client.workflows.create({ fields: [{ data_type: 'string', name: 'invoice_number' }], name: 'Invoice Processing' });\n\nconsole.log(workflow);\n```",
     perLanguage: {
       typescript: {
         method: 'client.workflows.create',
         example:
-          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflow = await client.workflows.create({\n  fields: [{ data_type: 'bar', name: 'bar' }],\n  name: 'Invoice Processing',\n});\n\nconsole.log(workflow.id);",
+          "import Anyformat from 'anyformat-ai';\n\nconst client = new Anyformat();\n\nconst workflow = await client.workflows.create({\n  fields: [{ data_type: 'string', name: 'invoice_number' }],\n  name: 'Invoice Processing',\n});\n\nconsole.log(workflow.id);",
       },
       python: {
         method: 'workflows.create',
         example:
-          'from anyformat import Anyformat\n\nclient = Anyformat()\nworkflow = client.workflows.create(\n    fields=[{\n        "data_type": "bar",\n        "name": "bar",\n    }],\n    name="Invoice Processing",\n)\nprint(workflow.id)',
+          'from anyformat import Anyformat\n\nclient = Anyformat()\nworkflow = client.workflows.create(\n    fields=[{\n        "data_type": "string",\n        "name": "invoice_number",\n    }],\n    name="Invoice Processing",\n)\nprint(workflow.id)',
       },
       go: {
         method: 'client.Workflows.New',
         example:
-          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient()\n\tworkflow, err := client.Workflows.New(context.TODO(), anyformat.WorkflowNewParams{\n\t\tFields: []map[string]any{{\n\t\t\t"data_type": "bar",\n\t\t\t"name":      "bar",\n\t\t}},\n\t\tName: "Invoice Processing",\n\t})\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflow.ID)\n}\n',
+          'package main\n\nimport (\n\t"context"\n\t"fmt"\n\n\t"github.com/anyformat-ai/anyformat-go"\n)\n\nfunc main() {\n\tclient := anyformat.NewClient()\n\tworkflow, err := client.Workflows.New(context.TODO(), anyformat.WorkflowNewParams{\n\t\tFields: []any{map[string]any{\n\t\t\t"data_type": "string",\n\t\t\t"name":      "invoice_number",\n\t\t}},\n\t\tName: "Invoice Processing",\n\t})\n\tif err != nil {\n\t\tpanic(err.Error())\n\t}\n\tfmt.Printf("%+v\\n", workflow.ID)\n}\n',
       },
       cli: {
         method: 'workflows create',
         example:
-          "anyformat workflows create \\\n  --field '{data_type: bar, name: bar}' \\\n  --name 'Invoice Processing'",
+          "anyformat workflows create \\\n  --field '{data_type: string, name: invoice_number}' \\\n  --name 'Invoice Processing'",
       },
       http: {
         example:
-          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -H \'Content-Type: application/json\' \\\n    -d \'{\n          "fields": [\n            {\n              "data_type": "bar",\n              "name": "bar"\n            }\n          ],\n          "name": "Invoice Processing",\n          "description": "Extracts invoice number, vendor, total, and line items."\n        }\'',
+          'curl https://api.anyformat.ai/v2/workflows/ \\\n    -H \'Content-Type: application/json\' \\\n    -d \'{\n          "fields": [\n            {\n              "data_type": "string",\n              "name": "invoice_number"\n            }\n          ],\n          "name": "Invoice Processing",\n          "description": "Extracts invoice number, vendor, total, and line items."\n        }\'',
       },
     },
   },

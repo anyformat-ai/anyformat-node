@@ -18,7 +18,7 @@ export class Workflows extends APIResource {
    * @example
    * ```ts
    * const workflow = await client.workflows.create({
-   *   fields: [{ data_type: 'bar', name: 'bar' }],
+   *   fields: [{ data_type: 'string', name: 'invoice_number' }],
    *   name: 'Invoice Processing',
    * });
    * ```
@@ -912,9 +912,9 @@ export interface WorkflowUploadResponse {
 
 export interface WorkflowCreateParams {
   /**
-   * Field definitions
+   * Field definitions. Each entry's shape is determined by its `data_type`.
    */
-  fields: Array<{ [key: string]: unknown }>;
+  fields: Array<unknown>;
 
   /**
    * Workflow name
