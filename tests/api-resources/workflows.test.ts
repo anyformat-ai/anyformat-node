@@ -11,7 +11,13 @@ describe('resource workflows', () => {
   // Mock server tests are disabled
   test.skip('create: only required params', async () => {
     const responsePromise = client.workflows.create({
-      fields: [{ data_type: 'string', name: 'invoice_number' }],
+      fields: [
+        {
+          data_type: 'string',
+          description: 'x',
+          name: 'invoice_number',
+        },
+      ],
       name: 'Invoice Processing',
     });
     const rawResponse = await responsePromise.asResponse();
@@ -26,7 +32,13 @@ describe('resource workflows', () => {
   // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.workflows.create({
-      fields: [{ data_type: 'string', name: 'invoice_number' }],
+      fields: [
+        {
+          data_type: 'string',
+          description: 'x',
+          name: 'invoice_number',
+        },
+      ],
       name: 'Invoice Processing',
       description: 'Extracts invoice number, vendor, total, and line items.',
     });
