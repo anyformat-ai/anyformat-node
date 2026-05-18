@@ -1010,6 +1010,13 @@ export interface WorkflowRunResponse {
   status: string;
 
   /**
+   * The workflow version this run was bound to (the latest version at submission
+   * time). Lets callers verify which schema produced the results — useful right
+   * after an edit.
+   */
+  version_id: string;
+
+  /**
    * The UUID of the workflow that was executed.
    */
   workflow_id: string;
