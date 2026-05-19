@@ -674,8 +674,8 @@ export namespace WorkflowGetFileResultsResponse {
   export interface Parse {
     /**
      * Document content rendered as structured markdown (with `<DOCUMENT>` /
-     * `<section>` tags, embedded images for the `visual` variant). `null` if parsing
-     * failed.
+     * `<section>` tags). Image hydration for picture/figure blocks happens
+     * client-side. `null` if parsing failed.
      */
     markdown: string | null;
 
@@ -758,9 +758,8 @@ export namespace WorkflowGetFileResultsResponse {
       hyperlinks?: Array<Block.Hyperlink>;
 
       /**
-       * Inline base64-encoded cropped image for `type=picture` blocks when the response
-       * was assembled from the visual markdown variant. `null` for non-picture blocks or
-       * when the raw variant was used.
+       * Inline base64-encoded cropped image for `type=picture` blocks. Currently `null`
+       * for all blocks — image hydration is performed client-side by the SDK consumer.
        */
       image_base64?: string | null;
 
