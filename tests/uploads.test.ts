@@ -1,7 +1,6 @@
 import fs from 'fs';
 import type { ResponseLike } from 'anyformat-ai/internal/to-file';
 import { toFile } from 'anyformat-ai/core/uploads';
-import { File } from 'node:buffer';
 
 class MyClass {
   name: string = 'foo';
