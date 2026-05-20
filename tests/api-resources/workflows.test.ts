@@ -11,14 +11,8 @@ describe('resource workflows', () => {
   // Mock server tests are disabled
   test.skip('create: only required params', async () => {
     const responsePromise = client.workflows.create({
-      fields: [
-        {
-          data_type: 'string',
-          description: 'x',
-          name: 'invoice_number',
-        },
-      ],
-      name: 'Invoice Processing',
+      name: 'Invoice or receipt',
+      nodes: [{ id: 'x', type: 'parse' }],
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -32,15 +26,27 @@ describe('resource workflows', () => {
   // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.workflows.create({
-      fields: [
+      name: 'Invoice or receipt',
+      nodes: [
         {
-          data_type: 'string',
-          description: 'x',
-          name: 'invoice_number',
+          id: 'x',
+          type: 'parse',
+          effort: 'low',
+          engine: 'Fast',
+          figure_enhancement_enabled: true,
+          mode: 'standard',
+          prompt_hint: 'prompt_hint',
+          visual_grounding_enabled: true,
         },
       ],
-      name: 'Invoice Processing',
-      description: 'Extracts invoice number, vendor, total, and line items.',
+      description: 'description',
+      edges: [
+        {
+          source: 'x',
+          target: 'x',
+          branch: 'branch',
+        },
+      ],
     });
   });
 
