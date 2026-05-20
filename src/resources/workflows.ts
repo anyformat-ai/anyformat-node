@@ -9,23 +9,17 @@ import { path } from '../internal/utils/path';
 
 export class Workflows extends APIResource {
   /**
-   * Create a new extraction workflow.
+   * Create a workflow from a strongly-typed graph (atomic).
    *
-   * Workflows define what data to extract from documents. After creating a workflow,
-   * configure its extraction fields in the
-   * [AnyFormat dashboard](https://app.anyformat.ai).
+   * Provide an explicit list of typed `nodes` (parse / classify / splitter /
+   * extract) and `edges` between them. The full workflow — fields, nodes, routing —
+   * is created in a single transaction.
    *
    * @example
    * ```ts
    * const workflow = await client.workflows.create({
-   *   fields: [
-   *     {
-   *       data_type: 'string',
-   *       description: 'x',
-   *       name: 'invoice_number',
-   *     },
-   *   ],
-   *   name: 'Invoice Processing',
+   *   name: 'Invoice or receipt',
+   *   nodes: [{ id: 'x', type: 'parse' }],
    * });
    * ```
    */
@@ -1038,335 +1032,505 @@ export interface WorkflowUploadResponse {
 }
 
 export interface WorkflowCreateParams {
-  /**
-   * Field definitions. Each entry's shape is determined by its `data_type`.
-   */
-  fields: Array<
-    | WorkflowCreateParams.StringFieldDef
-    | WorkflowCreateParams.IntegerFieldDef
-    | WorkflowCreateParams.FloatFieldDef
-    | WorkflowCreateParams.BooleanFieldDef
-    | WorkflowCreateParams.DateFieldDef
-    | WorkflowCreateParams.DatetimeFieldDef
-    | WorkflowCreateParams.EnumFieldDef
-    | WorkflowCreateParams.MultiSelectFieldDef
-    | WorkflowCreateParams.ObjectFieldDef
-  >;
-
-  /**
-   * Workflow name
-   */
   name: string;
 
-  /**
-   * Workflow description
-   */
+  nodes: Array<
+    | WorkflowCreateParams.ParseNode
+    | WorkflowCreateParams.ClassifyNode
+    | WorkflowCreateParams.SplitterNode
+    | WorkflowCreateParams.ExtractNode
+    | WorkflowCreateParams.ValidateNode
+  >;
+
   description?: string | null;
+
+  edges?: Array<WorkflowCreateParams.Edge>;
 }
 
 export namespace WorkflowCreateParams {
-  export interface StringFieldDef {
-    data_type: 'string';
+  export interface ParseNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    type: 'parse';
 
     /**
-     * Free-form description shown to the extraction model.
+     * Effort preset for agentic mode (low/mid/accurate). Defaults to 'mid' when
+     * `mode='agentic'` and not set; must be omitted when `mode='standard'`.
      */
-    description: string;
+    effort?: 'low' | 'mid' | 'accurate' | null;
+
+    engine?: 'Fast' | 'Performant';
+
+    figure_enhancement_enabled?: boolean;
+
+    mode?: 'standard' | 'agentic';
 
     /**
-     * Field name. Used as the key in the extraction response.
+     * Free-form hint shown to the parse model to bias output.
      */
-    name: string;
+    prompt_hint?: string | null;
+
+    visual_grounding_enabled?: boolean;
   }
 
-  export interface IntegerFieldDef {
-    data_type: 'integer';
+  export interface ClassifyNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    categories: Array<ClassifyNode.Category>;
+
+    type: 'classify';
 
     /**
-     * Free-form description shown to the extraction model.
+     * Optional prompt prefix for the classifier.
      */
-    description: string;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
+    user_prompt?: string | null;
   }
 
-  export interface FloatFieldDef {
-    data_type: 'float';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-  }
-
-  export interface BooleanFieldDef {
-    data_type: 'boolean';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-  }
-
-  export interface DateFieldDef {
-    data_type: 'date';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-  }
-
-  export interface DatetimeFieldDef {
-    data_type: 'datetime';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-  }
-
-  export interface EnumFieldDef {
-    data_type: 'enum';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    enum_options: Array<EnumFieldDef.EnumOption>;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-  }
-
-  export namespace EnumFieldDef {
-    export interface EnumOption {
+  export namespace ClassifyNode {
+    export interface Category {
       /**
-       * Free-form description shown to the model.
+       * Stable category id used as the edge `branch` value when routing.
        */
-      description: string;
-
-      name: string;
-    }
-  }
-
-  export interface MultiSelectFieldDef {
-    data_type: 'multi_select';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    enum_options: Array<MultiSelectFieldDef.EnumOption>;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-  }
-
-  export namespace MultiSelectFieldDef {
-    export interface EnumOption {
-      /**
-       * Free-form description shown to the model.
-       */
-      description: string;
-
-      name: string;
-    }
-  }
-
-  export interface ObjectFieldDef {
-    data_type: 'object';
-
-    /**
-     * Free-form description shown to the extraction model.
-     */
-    description: string;
-
-    /**
-     * Field name. Used as the key in the extraction response.
-     */
-    name: string;
-
-    nested_fields: Array<
-      | ObjectFieldDef.StringFieldDef
-      | ObjectFieldDef.IntegerFieldDef
-      | ObjectFieldDef.FloatFieldDef
-      | ObjectFieldDef.BooleanFieldDef
-      | ObjectFieldDef.DateFieldDef
-      | ObjectFieldDef.DatetimeFieldDef
-      | ObjectFieldDef.EnumFieldDef
-      | ObjectFieldDef.MultiSelectFieldDef
-      | unknown
-    >;
-  }
-
-  export namespace ObjectFieldDef {
-    export interface StringFieldDef {
-      data_type: 'string';
+      id: string;
 
       /**
-       * Free-form description shown to the extraction model.
+       * Free-form description shown to the LLM.
        */
       description: string;
 
       /**
-       * Field name. Used as the key in the extraction response.
+       * Display name shown to the LLM.
        */
       name: string;
     }
+  }
 
-    export interface IntegerFieldDef {
-      data_type: 'integer';
+  export interface SplitterNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
 
-      /**
-       * Free-form description shown to the extraction model.
-       */
+    rules: Array<SplitterNode.Rule>;
+
+    type: 'splitter';
+  }
+
+  export namespace SplitterNode {
+    export interface Rule {
+      id: string;
+
       description: string;
 
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
       name: string;
+
+      partition_key: string;
+    }
+  }
+
+  export interface ExtractNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    /**
+     * Schema for the fields this node extracts.
+     */
+    extraction_schema: ExtractNode.ExtractionSchema;
+
+    type: 'extract';
+
+    use_images?: boolean;
+  }
+
+  export namespace ExtractNode {
+    /**
+     * Schema for the fields this node extracts.
+     */
+    export interface ExtractionSchema {
+      /**
+       * Field definitions making up this extract's output.
+       */
+      fields: Array<
+        | ExtractionSchema.StringFieldDef
+        | ExtractionSchema.IntegerFieldDef
+        | ExtractionSchema.FloatFieldDef
+        | ExtractionSchema.BooleanFieldDef
+        | ExtractionSchema.DateFieldDef
+        | ExtractionSchema.DatetimeFieldDef
+        | ExtractionSchema.EnumFieldDef
+        | ExtractionSchema.MultiSelectFieldDef
+        | ExtractionSchema.ObjectFieldDef
+      >;
     }
 
-    export interface FloatFieldDef {
-      data_type: 'float';
+    export namespace ExtractionSchema {
+      export interface StringFieldDef {
+        data_type: 'string';
 
-      /**
-       * Free-form description shown to the extraction model.
-       */
-      description: string;
-
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
-      name: string;
-    }
-
-    export interface BooleanFieldDef {
-      data_type: 'boolean';
-
-      /**
-       * Free-form description shown to the extraction model.
-       */
-      description: string;
-
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
-      name: string;
-    }
-
-    export interface DateFieldDef {
-      data_type: 'date';
-
-      /**
-       * Free-form description shown to the extraction model.
-       */
-      description: string;
-
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
-      name: string;
-    }
-
-    export interface DatetimeFieldDef {
-      data_type: 'datetime';
-
-      /**
-       * Free-form description shown to the extraction model.
-       */
-      description: string;
-
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
-      name: string;
-    }
-
-    export interface EnumFieldDef {
-      data_type: 'enum';
-
-      /**
-       * Free-form description shown to the extraction model.
-       */
-      description: string;
-
-      enum_options: Array<EnumFieldDef.EnumOption>;
-
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
-      name: string;
-    }
-
-    export namespace EnumFieldDef {
-      export interface EnumOption {
         /**
-         * Free-form description shown to the model.
+         * Free-form description shown to the extraction model.
          */
         description: string;
 
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
         name: string;
       }
-    }
 
-    export interface MultiSelectFieldDef {
-      data_type: 'multi_select';
+      export interface IntegerFieldDef {
+        data_type: 'integer';
 
-      /**
-       * Free-form description shown to the extraction model.
-       */
-      description: string;
-
-      enum_options: Array<MultiSelectFieldDef.EnumOption>;
-
-      /**
-       * Field name. Used as the key in the extraction response.
-       */
-      name: string;
-    }
-
-    export namespace MultiSelectFieldDef {
-      export interface EnumOption {
         /**
-         * Free-form description shown to the model.
+         * Free-form description shown to the extraction model.
          */
         description: string;
 
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
         name: string;
       }
+
+      export interface FloatFieldDef {
+        data_type: 'float';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface BooleanFieldDef {
+        data_type: 'boolean';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface DateFieldDef {
+        data_type: 'date';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface DatetimeFieldDef {
+        data_type: 'datetime';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface EnumFieldDef {
+        data_type: 'enum';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<EnumFieldDef.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export namespace EnumFieldDef {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+
+      export interface MultiSelectFieldDef {
+        data_type: 'multi_select';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<MultiSelectFieldDef.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export namespace MultiSelectFieldDef {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+
+      export interface ObjectFieldDef {
+        data_type: 'object';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        nested_fields: Array<
+          | ObjectFieldDef.StringFieldDef
+          | ObjectFieldDef.IntegerFieldDef
+          | ObjectFieldDef.FloatFieldDef
+          | ObjectFieldDef.BooleanFieldDef
+          | ObjectFieldDef.DateFieldDef
+          | ObjectFieldDef.DatetimeFieldDef
+          | ObjectFieldDef.EnumFieldDef
+          | ObjectFieldDef.MultiSelectFieldDef
+          | unknown
+        >;
+      }
+
+      export namespace ObjectFieldDef {
+        export interface StringFieldDef {
+          data_type: 'string';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export interface IntegerFieldDef {
+          data_type: 'integer';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export interface FloatFieldDef {
+          data_type: 'float';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export interface BooleanFieldDef {
+          data_type: 'boolean';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export interface DateFieldDef {
+          data_type: 'date';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export interface DatetimeFieldDef {
+          data_type: 'datetime';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export interface EnumFieldDef {
+          data_type: 'enum';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          enum_options: Array<EnumFieldDef.EnumOption>;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export namespace EnumFieldDef {
+          export interface EnumOption {
+            /**
+             * Free-form description shown to the model.
+             */
+            description: string;
+
+            name: string;
+          }
+        }
+
+        export interface MultiSelectFieldDef {
+          data_type: 'multi_select';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          enum_options: Array<MultiSelectFieldDef.EnumOption>;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+        }
+
+        export namespace MultiSelectFieldDef {
+          export interface EnumOption {
+            /**
+             * Free-form description shown to the model.
+             */
+            description: string;
+
+            name: string;
+          }
+        }
+      }
     }
+  }
+
+  export interface ValidateNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    rules: Array<ValidateNode.Rule>;
+
+    type: 'validate';
+  }
+
+  export namespace ValidateNode {
+    export interface Rule {
+      /**
+       * Stable rule id; round-trips through ValidationResult.rule_id.
+       */
+      id: string;
+
+      /**
+       * Natural-language description shown to the validation model.
+       */
+      description: string;
+
+      /**
+       * Optional human-readable rule name shown on the rule card in the Studio. Stored
+       * verbatim on the GraphNode config and surfaced back through the config endpoint
+       * so renames round-trip.
+       */
+      name?: string | null;
+
+      severity?: 'error' | 'warning';
+
+      /**
+       * Persistent ids of fields this rule references.
+       */
+      source_fields?: Array<string>;
+    }
+  }
+
+  /**
+   * A directed edge between two nodes. `branch` carries the source-port label used
+   * for routing out of `classify` (category id) or `splitter` (rule id) nodes.
+   */
+  export interface Edge {
+    source: string;
+
+    target: string;
+
+    /**
+     * Source-port label for branch routing. Required when leaving a classify or
+     * splitter node by category/rule.
+     */
+    branch?: string | null;
   }
 }
 
