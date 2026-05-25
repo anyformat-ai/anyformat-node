@@ -667,17 +667,19 @@ export namespace WorkflowGetFileResultsResponse {
    */
   export interface Parse {
     /**
-     * Document content rendered as structured markdown (with `<DOCUMENT>` /
-     * `<section>` tags). Image hydration for picture/figure blocks happens
-     * client-side. `null` if parsing failed.
+     * Document content rendered as structured markdown. Each block is preceded by an
+     * empty `<a id="p{page}_b{idx}"></a>` anchor (invisible in any markdown renderer;
+     * the id joins to `blocks[].id` and can be used as an in-page link target). Image
+     * hydration for picture/figure blocks happens client-side. `null` if parsing
+     * failed.
      */
     markdown: string | null;
 
     /**
-     * Structured per-block representation of the parsed document — derived from
-     * `markdown` at retrieval time. One entry per `<section>` in document order, with
-     * type-specific structured data (`rows` for tables, `image_base64` for pictures)
-     * surfaced as first-class fields so consumers don't have to HTML-parse.
+     * Structured per-block representation of the parsed document. One entry per
+     * `<a id></a>` anchor in document order, with type-specific structured data
+     * (`rows` for tables, `image_base64` for pictures) surfaced as first-class fields
+     * so consumers don't have to HTML-parse.
      */
     blocks?: Array<Parse.Block>;
 
@@ -695,18 +697,18 @@ export namespace WorkflowGetFileResultsResponse {
     parse_confidence?: number | null;
 
     /**
-     * Plain markdown text with structural tags stripped — `<DOCUMENT>`, `<section>`,
-     * `<img>`, and `<figure-content>` wrappers removed, leaving the human-readable
-     * content only. Useful when feeding the parsed output into an LLM or a search
-     * index that doesn't need the block-level metadata. `null` if `markdown` is null.
+     * Plain markdown with structural HTML removed — `<DOCUMENT>` framing, block
+     * anchors, `<img>` tags, and `<figure-content>` wrappers stripped. Useful when
+     * feeding the parsed output into an LLM or a search index that doesn't need the
+     * block-level metadata. `null` if `markdown` is null.
      */
     text?: string | null;
   }
 
   export namespace Parse {
     /**
-     * One semantic block of a parsed document — a structured alternative to
-     * pattern-matching against `<section>` tags inside `markdown`.
+     * One semantic block of a parsed document — a structured alternative to walking
+     * `<a id></a>` anchors in `markdown`.
      *
      * All blocks expose the common fields (`id`, `type`, `page`, `bbox`, `confidence`,
      * `content`). Type-specific structured data lives in the optional fields (`rows`
@@ -1057,14 +1059,14 @@ export namespace WorkflowCreateParams {
     type: 'parse';
 
     /**
-     * Effort preset for agentic mode (low/mid/accurate). Defaults to 'mid' when
-     * `mode='agentic'` and not set; must be omitted when `mode='standard'`.
+     * Effort preset for the agentic parser. Only consulted when `mode='agentic'`;
+     * ignored for `mode='standard'`.
      */
-    effort?: 'low' | 'mid' | 'accurate' | null;
+    effort?: 'low' | 'mid' | 'accurate';
 
     engine?: 'Fast' | 'Performant';
 
-    figure_enhancement_enabled?: boolean;
+    figure_enhancement?: boolean;
 
     mode?: 'standard' | 'agentic';
 
@@ -1130,7 +1132,7 @@ export namespace WorkflowCreateParams {
 
       name: string;
 
-      partition_key: string;
+      partition_key?: string;
     }
   }
 
@@ -1141,18 +1143,55 @@ export namespace WorkflowCreateParams {
     id: string;
 
     /**
-     * Schema for the fields this node extracts.
+     * Schema for the fields this node extracts. Required. The backend executor
+     * populates this from the ORM field tree before constructing the typed node;
+     * nothing else should be able to build an ExtractNode without it.
      */
     extraction_schema: ExtractNode.ExtractionSchema;
 
     type: 'extract';
+
+    engine?: 'Fast' | 'Performant';
+
+    /**
+     * Smart-lookup reference document URIs persisted on the extract node.
+     */
+    lookup_files?: Array<string>;
+
+    /**
+     * Typed schema of fields the smart-lookup pass should produce. The _backend_
+     * derives this from the field tree (FieldWorkflowVersion rows whose source is
+     * SMART_LOOKUP) and attaches it to the node before the message hits the wire — the
+     * worker then reads it directly off the node, with no DB round-trip. Default
+     * empty: a node without smart-lookup fields carries an empty list.
+     */
+    lookup_schema?: Array<
+      | ExtractNode.StringFieldDef
+      | ExtractNode.IntegerFieldDef
+      | ExtractNode.FloatFieldDef
+      | ExtractNode.BooleanFieldDef
+      | ExtractNode.DateFieldDef
+      | ExtractNode.DatetimeFieldDef
+      | ExtractNode.EnumFieldDef
+      | ExtractNode.MultiSelectFieldDef
+      | ExtractNode.ObjectFieldDef
+    >;
+
+    /**
+     * Free-form hint shown to the smart-lookup matcher.
+     */
+    lookup_suggestion?: string | null;
+
+    mode?: 'standard' | 'agentic';
 
     use_images?: boolean;
   }
 
   export namespace ExtractNode {
     /**
-     * Schema for the fields this node extracts.
+     * Schema for the fields this node extracts. Required. The backend executor
+     * populates this from the ORM field tree before constructing the typed node;
+     * nothing else should be able to build an ExtractNode without it.
      */
     export interface ExtractionSchema {
       /**
@@ -1473,6 +1512,310 @@ export namespace WorkflowCreateParams {
 
             name: string;
           }
+        }
+      }
+    }
+
+    export interface StringFieldDef {
+      data_type: 'string';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export interface IntegerFieldDef {
+      data_type: 'integer';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export interface FloatFieldDef {
+      data_type: 'float';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export interface BooleanFieldDef {
+      data_type: 'boolean';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export interface DateFieldDef {
+      data_type: 'date';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export interface DatetimeFieldDef {
+      data_type: 'datetime';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export interface EnumFieldDef {
+      data_type: 'enum';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      enum_options: Array<EnumFieldDef.EnumOption>;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export namespace EnumFieldDef {
+      export interface EnumOption {
+        /**
+         * Free-form description shown to the model.
+         */
+        description: string;
+
+        name: string;
+      }
+    }
+
+    export interface MultiSelectFieldDef {
+      data_type: 'multi_select';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      enum_options: Array<MultiSelectFieldDef.EnumOption>;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+    }
+
+    export namespace MultiSelectFieldDef {
+      export interface EnumOption {
+        /**
+         * Free-form description shown to the model.
+         */
+        description: string;
+
+        name: string;
+      }
+    }
+
+    export interface ObjectFieldDef {
+      data_type: 'object';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      nested_fields: Array<
+        | ObjectFieldDef.StringFieldDef
+        | ObjectFieldDef.IntegerFieldDef
+        | ObjectFieldDef.FloatFieldDef
+        | ObjectFieldDef.BooleanFieldDef
+        | ObjectFieldDef.DateFieldDef
+        | ObjectFieldDef.DatetimeFieldDef
+        | ObjectFieldDef.EnumFieldDef
+        | ObjectFieldDef.MultiSelectFieldDef
+        | unknown
+      >;
+    }
+
+    export namespace ObjectFieldDef {
+      export interface StringFieldDef {
+        data_type: 'string';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface IntegerFieldDef {
+        data_type: 'integer';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface FloatFieldDef {
+        data_type: 'float';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface BooleanFieldDef {
+        data_type: 'boolean';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface DateFieldDef {
+        data_type: 'date';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface DatetimeFieldDef {
+        data_type: 'datetime';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export interface EnumFieldDef {
+        data_type: 'enum';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<EnumFieldDef.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export namespace EnumFieldDef {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+
+      export interface MultiSelectFieldDef {
+        data_type: 'multi_select';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<MultiSelectFieldDef.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+      }
+
+      export namespace MultiSelectFieldDef {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
         }
       }
     }
