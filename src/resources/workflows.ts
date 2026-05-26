@@ -1154,15 +1154,15 @@ export namespace WorkflowCreateParams {
      * empty: a node without smart-lookup fields carries an empty list.
      */
     lookup_schema?: Array<
-      | ExtractNode.StringFieldDef
-      | ExtractNode.IntegerFieldDef
-      | ExtractNode.FloatFieldDef
-      | ExtractNode.BooleanFieldDef
-      | ExtractNode.DateFieldDef
-      | ExtractNode.DatetimeFieldDef
-      | ExtractNode.EnumFieldDef
-      | ExtractNode.MultiSelectFieldDef
-      | ExtractNode.ObjectFieldDef
+      | ExtractNode.StringField
+      | ExtractNode.IntegerField
+      | ExtractNode.FloatField
+      | ExtractNode.BooleanField
+      | ExtractNode.DateField
+      | ExtractNode.DatetimeField
+      | ExtractNode.EnumField
+      | ExtractNode.MultiSelectField
+      | ExtractNode.ObjectField
     >;
 
     /**
@@ -1186,20 +1186,20 @@ export namespace WorkflowCreateParams {
        * Field definitions making up this extract's output.
        */
       fields: Array<
-        | ExtractionSchema.StringFieldDef
-        | ExtractionSchema.IntegerFieldDef
-        | ExtractionSchema.FloatFieldDef
-        | ExtractionSchema.BooleanFieldDef
-        | ExtractionSchema.DateFieldDef
-        | ExtractionSchema.DatetimeFieldDef
-        | ExtractionSchema.EnumFieldDef
-        | ExtractionSchema.MultiSelectFieldDef
-        | ExtractionSchema.ObjectFieldDef
+        | ExtractionSchema.StringField
+        | ExtractionSchema.IntegerField
+        | ExtractionSchema.FloatField
+        | ExtractionSchema.BooleanField
+        | ExtractionSchema.DateField
+        | ExtractionSchema.DatetimeField
+        | ExtractionSchema.EnumField
+        | ExtractionSchema.MultiSelectField
+        | ExtractionSchema.ObjectField
       >;
     }
 
     export namespace ExtractionSchema {
-      export interface StringFieldDef {
+      export interface StringField {
         data_type: 'string';
 
         /**
@@ -1213,7 +1213,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface IntegerFieldDef {
+      export interface IntegerField {
         data_type: 'integer';
 
         /**
@@ -1227,7 +1227,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface FloatFieldDef {
+      export interface FloatField {
         data_type: 'float';
 
         /**
@@ -1241,7 +1241,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface BooleanFieldDef {
+      export interface BooleanField {
         data_type: 'boolean';
 
         /**
@@ -1255,7 +1255,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface DateFieldDef {
+      export interface DateField {
         data_type: 'date';
 
         /**
@@ -1269,7 +1269,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface DatetimeFieldDef {
+      export interface DatetimeField {
         data_type: 'datetime';
 
         /**
@@ -1283,7 +1283,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface EnumFieldDef {
+      export interface EnumField {
         data_type: 'enum';
 
         /**
@@ -1291,7 +1291,7 @@ export namespace WorkflowCreateParams {
          */
         description: string;
 
-        enum_options: Array<EnumFieldDef.EnumOption>;
+        enum_options: Array<EnumField.EnumOption>;
 
         /**
          * Field name. Used as the key in the extraction response.
@@ -1299,7 +1299,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export namespace EnumFieldDef {
+      export namespace EnumField {
         export interface EnumOption {
           /**
            * Free-form description shown to the model.
@@ -1310,7 +1310,7 @@ export namespace WorkflowCreateParams {
         }
       }
 
-      export interface MultiSelectFieldDef {
+      export interface MultiSelectField {
         data_type: 'multi_select';
 
         /**
@@ -1318,7 +1318,7 @@ export namespace WorkflowCreateParams {
          */
         description: string;
 
-        enum_options: Array<MultiSelectFieldDef.EnumOption>;
+        enum_options: Array<MultiSelectField.EnumOption>;
 
         /**
          * Field name. Used as the key in the extraction response.
@@ -1326,7 +1326,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export namespace MultiSelectFieldDef {
+      export namespace MultiSelectField {
         export interface EnumOption {
           /**
            * Free-form description shown to the model.
@@ -1337,7 +1337,7 @@ export namespace WorkflowCreateParams {
         }
       }
 
-      export interface ObjectFieldDef {
+      export interface ObjectField {
         data_type: 'object';
 
         /**
@@ -1351,20 +1351,20 @@ export namespace WorkflowCreateParams {
         name: string;
 
         nested_fields: Array<
-          | ObjectFieldDef.StringFieldDef
-          | ObjectFieldDef.IntegerFieldDef
-          | ObjectFieldDef.FloatFieldDef
-          | ObjectFieldDef.BooleanFieldDef
-          | ObjectFieldDef.DateFieldDef
-          | ObjectFieldDef.DatetimeFieldDef
-          | ObjectFieldDef.EnumFieldDef
-          | ObjectFieldDef.MultiSelectFieldDef
+          | ObjectField.StringField
+          | ObjectField.IntegerField
+          | ObjectField.FloatField
+          | ObjectField.BooleanField
+          | ObjectField.DateField
+          | ObjectField.DatetimeField
+          | ObjectField.EnumField
+          | ObjectField.MultiSelectField
           | unknown
         >;
       }
 
-      export namespace ObjectFieldDef {
-        export interface StringFieldDef {
+      export namespace ObjectField {
+        export interface StringField {
           data_type: 'string';
 
           /**
@@ -1378,7 +1378,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export interface IntegerFieldDef {
+        export interface IntegerField {
           data_type: 'integer';
 
           /**
@@ -1392,7 +1392,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export interface FloatFieldDef {
+        export interface FloatField {
           data_type: 'float';
 
           /**
@@ -1406,7 +1406,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export interface BooleanFieldDef {
+        export interface BooleanField {
           data_type: 'boolean';
 
           /**
@@ -1420,7 +1420,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export interface DateFieldDef {
+        export interface DateField {
           data_type: 'date';
 
           /**
@@ -1434,7 +1434,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export interface DatetimeFieldDef {
+        export interface DatetimeField {
           data_type: 'datetime';
 
           /**
@@ -1448,7 +1448,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export interface EnumFieldDef {
+        export interface EnumField {
           data_type: 'enum';
 
           /**
@@ -1456,7 +1456,7 @@ export namespace WorkflowCreateParams {
            */
           description: string;
 
-          enum_options: Array<EnumFieldDef.EnumOption>;
+          enum_options: Array<EnumField.EnumOption>;
 
           /**
            * Field name. Used as the key in the extraction response.
@@ -1464,7 +1464,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export namespace EnumFieldDef {
+        export namespace EnumField {
           export interface EnumOption {
             /**
              * Free-form description shown to the model.
@@ -1475,7 +1475,7 @@ export namespace WorkflowCreateParams {
           }
         }
 
-        export interface MultiSelectFieldDef {
+        export interface MultiSelectField {
           data_type: 'multi_select';
 
           /**
@@ -1483,7 +1483,7 @@ export namespace WorkflowCreateParams {
            */
           description: string;
 
-          enum_options: Array<MultiSelectFieldDef.EnumOption>;
+          enum_options: Array<MultiSelectField.EnumOption>;
 
           /**
            * Field name. Used as the key in the extraction response.
@@ -1491,7 +1491,7 @@ export namespace WorkflowCreateParams {
           name: string;
         }
 
-        export namespace MultiSelectFieldDef {
+        export namespace MultiSelectField {
           export interface EnumOption {
             /**
              * Free-form description shown to the model.
@@ -1504,7 +1504,7 @@ export namespace WorkflowCreateParams {
       }
     }
 
-    export interface StringFieldDef {
+    export interface StringField {
       data_type: 'string';
 
       /**
@@ -1518,7 +1518,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export interface IntegerFieldDef {
+    export interface IntegerField {
       data_type: 'integer';
 
       /**
@@ -1532,7 +1532,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export interface FloatFieldDef {
+    export interface FloatField {
       data_type: 'float';
 
       /**
@@ -1546,7 +1546,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export interface BooleanFieldDef {
+    export interface BooleanField {
       data_type: 'boolean';
 
       /**
@@ -1560,7 +1560,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export interface DateFieldDef {
+    export interface DateField {
       data_type: 'date';
 
       /**
@@ -1574,7 +1574,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export interface DatetimeFieldDef {
+    export interface DatetimeField {
       data_type: 'datetime';
 
       /**
@@ -1588,7 +1588,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export interface EnumFieldDef {
+    export interface EnumField {
       data_type: 'enum';
 
       /**
@@ -1596,7 +1596,7 @@ export namespace WorkflowCreateParams {
        */
       description: string;
 
-      enum_options: Array<EnumFieldDef.EnumOption>;
+      enum_options: Array<EnumField.EnumOption>;
 
       /**
        * Field name. Used as the key in the extraction response.
@@ -1604,7 +1604,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export namespace EnumFieldDef {
+    export namespace EnumField {
       export interface EnumOption {
         /**
          * Free-form description shown to the model.
@@ -1615,7 +1615,7 @@ export namespace WorkflowCreateParams {
       }
     }
 
-    export interface MultiSelectFieldDef {
+    export interface MultiSelectField {
       data_type: 'multi_select';
 
       /**
@@ -1623,7 +1623,7 @@ export namespace WorkflowCreateParams {
        */
       description: string;
 
-      enum_options: Array<MultiSelectFieldDef.EnumOption>;
+      enum_options: Array<MultiSelectField.EnumOption>;
 
       /**
        * Field name. Used as the key in the extraction response.
@@ -1631,7 +1631,7 @@ export namespace WorkflowCreateParams {
       name: string;
     }
 
-    export namespace MultiSelectFieldDef {
+    export namespace MultiSelectField {
       export interface EnumOption {
         /**
          * Free-form description shown to the model.
@@ -1642,7 +1642,7 @@ export namespace WorkflowCreateParams {
       }
     }
 
-    export interface ObjectFieldDef {
+    export interface ObjectField {
       data_type: 'object';
 
       /**
@@ -1656,20 +1656,20 @@ export namespace WorkflowCreateParams {
       name: string;
 
       nested_fields: Array<
-        | ObjectFieldDef.StringFieldDef
-        | ObjectFieldDef.IntegerFieldDef
-        | ObjectFieldDef.FloatFieldDef
-        | ObjectFieldDef.BooleanFieldDef
-        | ObjectFieldDef.DateFieldDef
-        | ObjectFieldDef.DatetimeFieldDef
-        | ObjectFieldDef.EnumFieldDef
-        | ObjectFieldDef.MultiSelectFieldDef
+        | ObjectField.StringField
+        | ObjectField.IntegerField
+        | ObjectField.FloatField
+        | ObjectField.BooleanField
+        | ObjectField.DateField
+        | ObjectField.DatetimeField
+        | ObjectField.EnumField
+        | ObjectField.MultiSelectField
         | unknown
       >;
     }
 
-    export namespace ObjectFieldDef {
-      export interface StringFieldDef {
+    export namespace ObjectField {
+      export interface StringField {
         data_type: 'string';
 
         /**
@@ -1683,7 +1683,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface IntegerFieldDef {
+      export interface IntegerField {
         data_type: 'integer';
 
         /**
@@ -1697,7 +1697,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface FloatFieldDef {
+      export interface FloatField {
         data_type: 'float';
 
         /**
@@ -1711,7 +1711,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface BooleanFieldDef {
+      export interface BooleanField {
         data_type: 'boolean';
 
         /**
@@ -1725,7 +1725,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface DateFieldDef {
+      export interface DateField {
         data_type: 'date';
 
         /**
@@ -1739,7 +1739,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface DatetimeFieldDef {
+      export interface DatetimeField {
         data_type: 'datetime';
 
         /**
@@ -1753,7 +1753,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export interface EnumFieldDef {
+      export interface EnumField {
         data_type: 'enum';
 
         /**
@@ -1761,7 +1761,7 @@ export namespace WorkflowCreateParams {
          */
         description: string;
 
-        enum_options: Array<EnumFieldDef.EnumOption>;
+        enum_options: Array<EnumField.EnumOption>;
 
         /**
          * Field name. Used as the key in the extraction response.
@@ -1769,7 +1769,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export namespace EnumFieldDef {
+      export namespace EnumField {
         export interface EnumOption {
           /**
            * Free-form description shown to the model.
@@ -1780,7 +1780,7 @@ export namespace WorkflowCreateParams {
         }
       }
 
-      export interface MultiSelectFieldDef {
+      export interface MultiSelectField {
         data_type: 'multi_select';
 
         /**
@@ -1788,7 +1788,7 @@ export namespace WorkflowCreateParams {
          */
         description: string;
 
-        enum_options: Array<MultiSelectFieldDef.EnumOption>;
+        enum_options: Array<MultiSelectField.EnumOption>;
 
         /**
          * Field name. Used as the key in the extraction response.
@@ -1796,7 +1796,7 @@ export namespace WorkflowCreateParams {
         name: string;
       }
 
-      export namespace MultiSelectFieldDef {
+      export namespace MultiSelectField {
         export interface EnumOption {
           /**
            * Free-form description shown to the model.
