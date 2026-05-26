@@ -31,12 +31,9 @@ describe('resource workflows', () => {
         {
           id: 'x',
           type: 'parse',
-          effort: 'low',
-          engine: 'Fast',
           figure_enhancement: true,
           mode: 'standard',
           prompt_hint: 'prompt_hint',
-          visual_grounding_enabled: true,
         },
       ],
       description: 'description',
