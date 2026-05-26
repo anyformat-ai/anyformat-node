@@ -1058,14 +1058,6 @@ export namespace WorkflowCreateParams {
 
     type: 'parse';
 
-    /**
-     * Effort preset for the agentic parser. Only consulted when `mode='agentic'`;
-     * ignored for `mode='standard'`.
-     */
-    effort?: 'low' | 'mid' | 'accurate';
-
-    engine?: 'Fast' | 'Performant';
-
     figure_enhancement?: boolean;
 
     mode?: 'standard' | 'agentic';
@@ -1074,8 +1066,6 @@ export namespace WorkflowCreateParams {
      * Free-form hint shown to the parse model to bias output.
      */
     prompt_hint?: string | null;
-
-    visual_grounding_enabled?: boolean;
   }
 
   export interface ClassifyNode {
@@ -1150,8 +1140,6 @@ export namespace WorkflowCreateParams {
     extraction_schema: ExtractNode.ExtractionSchema;
 
     type: 'extract';
-
-    engine?: 'Fast' | 'Performant';
 
     /**
      * Smart-lookup reference document URIs persisted on the extract node.
