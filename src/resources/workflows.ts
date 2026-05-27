@@ -1142,6 +1142,13 @@ export namespace WorkflowCreateParams {
     type: 'extract';
 
     /**
+     * Inline lookup-file content for the typed create call. The backend uploads each
+     * entry to S3 and stores the resulting URI in `lookup_files`; this field is never
+     * persisted in GraphNode.config.
+     */
+    lookup_file_uploads?: Array<ExtractNode.LookupFileUpload>;
+
+    /**
      * Smart-lookup reference document URIs persisted on the extract node.
      */
     lookup_files?: Array<string>;
@@ -1211,6 +1218,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface IntegerField {
@@ -1225,6 +1234,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface FloatField {
@@ -1239,6 +1250,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface BooleanField {
@@ -1253,6 +1266,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface DateField {
@@ -1267,6 +1282,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface DatetimeField {
@@ -1281,6 +1298,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface EnumField {
@@ -1297,6 +1316,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export namespace EnumField {
@@ -1324,6 +1345,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export namespace MultiSelectField {
@@ -1361,6 +1384,8 @@ export namespace WorkflowCreateParams {
           | ObjectField.MultiSelectField
           | unknown
         >;
+
+        lookup?: boolean;
       }
 
       export namespace ObjectField {
@@ -1376,6 +1401,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export interface IntegerField {
@@ -1390,6 +1417,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export interface FloatField {
@@ -1404,6 +1433,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export interface BooleanField {
@@ -1418,6 +1449,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export interface DateField {
@@ -1432,6 +1465,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export interface DatetimeField {
@@ -1446,6 +1481,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export interface EnumField {
@@ -1462,6 +1499,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export namespace EnumField {
@@ -1489,6 +1528,8 @@ export namespace WorkflowCreateParams {
            * Field name. Used as the key in the extraction response.
            */
           name: string;
+
+          lookup?: boolean;
         }
 
         export namespace MultiSelectField {
@@ -1504,6 +1545,23 @@ export namespace WorkflowCreateParams {
       }
     }
 
+    /**
+     * Inline lookup-file content carried on the typed create call.
+     *
+     * The backend reads `filename` + `content` (base64-encoded bytes), uploads the
+     * file to S3 during workflow create, and stores the resulting URI in
+     * `ExtractNode.lookup_files`. This field is stripped from the persisted
+     * `GraphNode.config` — it is create-input only.
+     */
+    export interface LookupFileUpload {
+      /**
+       * Base64-encoded file bytes.
+       */
+      content: string;
+
+      filename: string;
+    }
+
     export interface StringField {
       data_type: 'string';
 
@@ -1516,6 +1574,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export interface IntegerField {
@@ -1530,6 +1590,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export interface FloatField {
@@ -1544,6 +1606,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export interface BooleanField {
@@ -1558,6 +1622,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export interface DateField {
@@ -1572,6 +1638,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export interface DatetimeField {
@@ -1586,6 +1654,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export interface EnumField {
@@ -1602,6 +1672,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export namespace EnumField {
@@ -1629,6 +1701,8 @@ export namespace WorkflowCreateParams {
        * Field name. Used as the key in the extraction response.
        */
       name: string;
+
+      lookup?: boolean;
     }
 
     export namespace MultiSelectField {
@@ -1666,6 +1740,8 @@ export namespace WorkflowCreateParams {
         | ObjectField.MultiSelectField
         | unknown
       >;
+
+      lookup?: boolean;
     }
 
     export namespace ObjectField {
@@ -1681,6 +1757,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface IntegerField {
@@ -1695,6 +1773,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface FloatField {
@@ -1709,6 +1789,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface BooleanField {
@@ -1723,6 +1805,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface DateField {
@@ -1737,6 +1821,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface DatetimeField {
@@ -1751,6 +1837,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export interface EnumField {
@@ -1767,6 +1855,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export namespace EnumField {
@@ -1794,6 +1884,8 @@ export namespace WorkflowCreateParams {
          * Field name. Used as the key in the extraction response.
          */
         name: string;
+
+        lookup?: boolean;
       }
 
       export namespace MultiSelectField {
