@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.8.0 (2026-05-27)
+
+Full Changelog: [v0.7.0...v0.8.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.7.0...v0.8.0)
+
+### Features
+
+* **api:** api update ([0247d6a](https://github.com/anyformat-ai/anyformat-node/commit/0247d6aeb895d8a5e497323744c056daa6288c36))
+* **api:** api update ([9c1dce3](https://github.com/anyformat-ai/anyformat-node/commit/9c1dce3b8105a7bb66d5536700317ff5f2b8b589))
+* **api:** api update ([877595f](https://github.com/anyformat-ai/anyformat-node/commit/877595f35b019a13edfdcb6f5ab8c48a4ba41fed))
+* **api:** api update ([21de3fe](https://github.com/anyformat-ai/anyformat-node/commit/21de3fe1b44958f91a6b0263654c412b5c30ea53))
+* **api:** api update ([add5f43](https://github.com/anyformat-ai/anyformat-node/commit/add5f43af29aa11fba65e305c6ab0b98c3587f90))
+* **api:** api update ([543a620](https://github.com/anyformat-ai/anyformat-node/commit/543a620b23543381bc863815d23b78c7b1bab9d5))
+* **api:** api update ([f08f519](https://github.com/anyformat-ai/anyformat-node/commit/f08f519106909a631b5dbba0822fcb0b5ef3422e))
+* **api:** api update ([bf5a30e](https://github.com/anyformat-ai/anyformat-node/commit/bf5a30e8f8f63fec2ab9429432f5f4baffc901b7))
+* **api:** api update ([9287c8b](https://github.com/anyformat-ai/anyformat-node/commit/9287c8b06cb86677824403afb2d03ed45e294d0a))
+* **api:** api update ([5aad704](https://github.com/anyformat-ai/anyformat-node/commit/5aad704dd662d2639b068a8760bf26915bc3ec01))
+* **api:** api update ([d32f12c](https://github.com/anyformat-ai/anyformat-node/commit/d32f12c9181a18b79c39c21b32297191b7dc41e7))
+
+
+### Bug Fixes
+
+* **typescript:** upgrade tsc-multi so that it works with Node 26 ([1085593](https://github.com/anyformat-ai/anyformat-node/commit/10855932e4fbc9d2ab16691b9e23e5065f11a8c2))
+
+
+### Chores
+
+* redact api-key headers in debug logs ([100d660](https://github.com/anyformat-ai/anyformat-node/commit/100d660123e872de2b51e1da95f0bd93b64935cf))
+* **tests:** remove redundant File import ([5857fcd](https://github.com/anyformat-ai/anyformat-node/commit/5857fcd86900fabce021b28982e732b02046a81a))
+
+
+### Documentation
+
+* update http mcp docs ([c6fc285](https://github.com/anyformat-ai/anyformat-node/commit/c6fc285f868884084840d478993b666041fade0c))
+
 ## 0.7.0 (2026-04-30)
 
 Full Changelog: [v0.6.0...v0.7.0](https://github.com/anyformat-ai/anyformat-node/compare/v0.6.0...v0.7.0)
