@@ -9,17 +9,17 @@ import { path } from '../internal/utils/path';
 
 export class Workflows extends APIResource {
   /**
-   * Create a new extraction workflow.
+   * Create a workflow from a strongly-typed graph (atomic).
    *
-   * Workflows define what data to extract from documents. After creating a workflow,
-   * configure its extraction fields in the
-   * [AnyFormat dashboard](https://app.anyformat.ai).
+   * Provide an explicit list of typed `nodes` (parse / classify / splitter /
+   * extract) and `edges` between them. The full workflow — fields, nodes, routing —
+   * is created in a single transaction.
    *
    * @example
    * ```ts
    * const workflow = await client.workflows.create({
-   *   fields: [{ data_type: 'bar', name: 'bar' }],
-   *   name: 'Invoice Processing',
+   *   name: 'Invoice or receipt',
+   *   nodes: [{ id: 'x', type: 'parse' }],
    * });
    * ```
    */
@@ -113,9 +113,19 @@ export class Workflows extends APIResource {
    * includes a `verification_url` linking to the AnyFormat dashboard for human
    * review.
    *
-   * Returns **412 Precondition Failed** if the extraction is still in progress. Poll
-   * this endpoint until you receive a 200 response, or use webhooks
-   * (`extraction.completed` event) to be notified when processing finishes.
+   * Possible non-200 responses:
+   *
+   * - **412 `PRECONDITION_FAILED`** — extraction still in progress; retry with
+   *   backoff.
+   * - **422 `EXTRACTION_FAILED`** — extraction did not complete successfully;
+   *   terminal. Polling will not transition the collection out of this state.
+   *   Possible next steps: review the document, retry the upload, or open the
+   *   collection in the AnyFormat dashboard for more context.
+   * - **422 `EXTRACTION_CANCELLED`** — extraction was cancelled; terminal. Possible
+   *   next steps: review the document, retry the upload, or open the collection in
+   *   the AnyFormat dashboard.
+   *
+   * Use webhooks (`extraction.completed` event) to avoid polling.
    *
    * @example
    * ```ts
@@ -353,10 +363,14 @@ export interface WorkflowGetFileResultsResponse {
   collection_id: string;
 
   /**
-   * Extracted fields keyed by field name. `null` for parse-only workflows. Always
-   * present in the response. Each value is either a scalar field (`ExtractedField`)
-   * or a list of object-field rows (`list[dict[str, ExtractedField]]`) for compound
-   * fields like line items.
+   * Per-classifier-node verdicts. Empty when the workflow has no classifier.
+   */
+  classifications?: Array<WorkflowGetFileResultsResponse.Classification>;
+
+  /**
+   * @deprecated **Deprecated** — use `extractions` instead. Extracted fields keyed
+   * by field name, populated only for linear workflows (single extract node, no
+   * splitter). `null` for split workflows; read `extractions[]` instead.
    */
   extraction?: {
     [key: string]:
@@ -365,9 +379,22 @@ export interface WorkflowGetFileResultsResponse {
   } | null;
 
   /**
+   * Flat list of extraction datapoints. Linear workflows produce one entry with
+   * `split_name=null` and `partition=null`. Split workflows produce one entry per
+   * (split, partition). Empty when no extraction has run yet.
+   */
+  extractions?: Array<WorkflowGetFileResultsResponse.Extraction>;
+
+  /**
    * Parsed markdown for a file.
    */
   parse?: WorkflowGetFileResultsResponse.Parse | null;
+
+  /**
+   * Splitter output: category-level geometry with optional partitions. Empty when
+   * the workflow has no splitter.
+   */
+  splits?: Array<WorkflowGetFileResultsResponse.Split>;
 
   /**
    * Link to the AnyFormat dashboard for human review of this collection's results.
@@ -379,6 +406,27 @@ export interface WorkflowGetFileResultsResponse {
 
 export namespace WorkflowGetFileResultsResponse {
   /**
+   * One classifier verdict for the collection.
+   */
+  export interface Classification {
+    /**
+     * The category the document was classified as.
+     */
+    category: string;
+
+    /**
+     * 0-100 model confidence in the verdict.
+     */
+    confidence: number;
+
+    /**
+     * Free-form evidence text (the snippets the classifier cited). `null` when none
+     * captured.
+     */
+    evidence?: string | null;
+  }
+
+  /**
    * One extracted field's value, confidence, and supporting evidence.
    */
   export interface ExtractedField {
@@ -479,6 +527,138 @@ export namespace WorkflowGetFileResultsResponse {
        * The exact source-text snippet that supports the extracted value.
        */
       text: string;
+    }
+  }
+
+  /**
+   * One unit of extracted data. For linear (parse->extract) workflows there is
+   * exactly one entry with `split_name=null` and `partition=null`. For split
+   * workflows there is one entry per (split, partition) pair; join with `splits[]`
+   * by `split_name` to look up geometry.
+   */
+  export interface Extraction {
+    /**
+     * Extracted fields keyed by field name. Same shape as the legacy top-level
+     * `extraction`.
+     */
+    fields: {
+      [key: string]: Extraction.ExtractedField | Array<{ [key: string]: Extraction.ExtractedField }>;
+    };
+
+    /**
+     * The partition value within the split. `null` when the split has no partitions.
+     */
+    partition?: string | null;
+
+    /**
+     * The split category this extraction belongs to. `null` for linear workflows.
+     */
+    split_name?: string | null;
+  }
+
+  export namespace Extraction {
+    /**
+     * One extracted field's value, confidence, and supporting evidence.
+     */
+    export interface ExtractedField {
+      /**
+       * The extracted value. Type depends on the field's `data_type` (string, number,
+       * date, etc.). `null` when extraction could not produce a value.
+       */
+      value: unknown;
+
+      /**
+       * Model confidence in the extracted value, on a 0-100 scale. `null` when the
+       * backend did not produce a confidence (e.g. manual entry).
+       */
+      confidence?: number | null;
+
+      /**
+       * Source-text snippets the model used to derive this value.
+       */
+      evidence?: Array<ExtractedField.Evidence>;
+
+      /**
+       * A human-supplied override of the extracted `value`, if one was set during
+       * verification. `null` when no override exists.
+       */
+      value_override?: unknown;
+
+      /**
+       * Verification state for this datapoint (e.g. `not_verified`, `verified`). `null`
+       * when not yet reviewed.
+       */
+      verification_status?: string | null;
+    }
+
+    export namespace ExtractedField {
+      /**
+       * A snippet of source text supporting an extracted value, with the page it came
+       * from.
+       */
+      export interface Evidence {
+        /**
+         * 1-indexed page number where the snippet was found.
+         */
+        page_number: number;
+
+        /**
+         * The exact source-text snippet that supports the extracted value.
+         */
+        text: string;
+      }
+    }
+
+    /**
+     * One extracted field's value, confidence, and supporting evidence.
+     */
+    export interface ExtractedField {
+      /**
+       * The extracted value. Type depends on the field's `data_type` (string, number,
+       * date, etc.). `null` when extraction could not produce a value.
+       */
+      value: unknown;
+
+      /**
+       * Model confidence in the extracted value, on a 0-100 scale. `null` when the
+       * backend did not produce a confidence (e.g. manual entry).
+       */
+      confidence?: number | null;
+
+      /**
+       * Source-text snippets the model used to derive this value.
+       */
+      evidence?: Array<ExtractedField.Evidence>;
+
+      /**
+       * A human-supplied override of the extracted `value`, if one was set during
+       * verification. `null` when no override exists.
+       */
+      value_override?: unknown;
+
+      /**
+       * Verification state for this datapoint (e.g. `not_verified`, `verified`). `null`
+       * when not yet reviewed.
+       */
+      verification_status?: string | null;
+    }
+
+    export namespace ExtractedField {
+      /**
+       * A snippet of source text supporting an extracted value, with the page it came
+       * from.
+       */
+      export interface Evidence {
+        /**
+         * 1-indexed page number where the snippet was found.
+         */
+        page_number: number;
+
+        /**
+         * The exact source-text snippet that supports the extracted value.
+         */
+        text: string;
+      }
     }
   }
 
@@ -487,11 +667,212 @@ export namespace WorkflowGetFileResultsResponse {
    */
   export interface Parse {
     /**
-     * Document content rendered as structured markdown (with `<DOCUMENT>` /
-     * `<section>` tags, embedded images for the `visual` variant). `null` if parsing
+     * Document content rendered as structured markdown. Each block is preceded by an
+     * empty `<a id="p{page}_b{idx}"></a>` anchor (invisible in any markdown renderer;
+     * the id joins to `blocks[].id` and can be used as an in-page link target). Image
+     * hydration for picture/figure blocks happens client-side. `null` if parsing
      * failed.
      */
     markdown: string | null;
+
+    /**
+     * Structured per-block representation of the parsed document. One entry per
+     * `<a id></a>` anchor in document order, with type-specific structured data
+     * (`rows` for tables, `image_base64` for pictures) surfaced as first-class fields
+     * so consumers don't have to HTML-parse.
+     */
+    blocks?: Array<Parse.Block>;
+
+    /**
+     * Document-level YOLO layout confidence on a 0-100 scale, char-weighted mean
+     * across all blocks. `null` if no annotated sections.
+     */
+    layout_confidence?: number | null;
+
+    /**
+     * Document-level parse confidence on a 0-100 scale, char-weighted mean of
+     * per-block LLM logprob scores. `null` when no blocks have logprob-based
+     * confidence.
+     */
+    parse_confidence?: number | null;
+
+    /**
+     * Plain markdown with structural HTML removed — `<DOCUMENT>` framing, block
+     * anchors, `<img>` tags, and `<figure-content>` wrappers stripped. Useful when
+     * feeding the parsed output into an LLM or a search index that doesn't need the
+     * block-level metadata. `null` if `markdown` is null.
+     */
+    text?: string | null;
+  }
+
+  export namespace Parse {
+    /**
+     * One semantic block of a parsed document — a structured alternative to walking
+     * `<a id></a>` anchors in `markdown`.
+     *
+     * All blocks expose the common fields (`id`, `type`, `page`, `bbox`, `confidence`,
+     * `content`). Type-specific structured data lives in the optional fields (`rows`
+     * for tables, `image_base64` for pictures). Consumers can switch on `type` to
+     * access the per-type fields, or treat `content` as the universal fallback.
+     */
+    export interface Block {
+      /**
+       * Stable block identifier in the form `p<page>_b<index>`.
+       */
+      id: string;
+
+      /**
+       * Normalised bounding box in [0, 1] page coordinates with keys
+       * `x0`/`y0`/`x1`/`y1`.
+       */
+      bbox: { [key: string]: number };
+
+      /**
+       * Raw section body — markdown for text/title blocks, HTML for tables,
+       * `<figure-content>` for pictures.
+       */
+      content: string;
+
+      /**
+       * 0-100 YOLO layout detection confidence for this block.
+       */
+      layout_confidence: number;
+
+      /**
+       * 1-indexed page number this block belongs to.
+       */
+      page: number;
+
+      /**
+       * Semantic type: `text`, `title`, `section-header`, `table`, `picture`, `other`.
+       */
+      type: string;
+
+      /**
+       * Hyperlinks found in the content via `[text](uri)` markdown syntax.
+       */
+      hyperlinks?: Array<Block.Hyperlink>;
+
+      /**
+       * Inline base64-encoded cropped image for `type=picture` blocks. Currently `null`
+       * for all blocks — image hydration is performed client-side by the SDK consumer.
+       */
+      image_base64?: string | null;
+
+      /**
+       * 0-100 parse confidence calibrated from LLM logprobs. `null` when logprobs were
+       * unavailable (e.g. text-bytes strategy).
+       */
+      parse_confidence?: number | null;
+
+      /**
+       * 2D array of table cells for `type=table` blocks — each cell is
+       * `{cell_id, text}`. `null` for non-table blocks.
+       */
+      rows?: Array<Array<{ [key: string]: string }>> | null;
+    }
+
+    export namespace Block {
+      /**
+       * A hyperlink found inside a block's content.
+       */
+      export interface Hyperlink {
+        /**
+         * The display text of the link.
+         */
+        text: string;
+
+        /**
+         * The link target (URL, mailto:, etc.).
+         */
+        uri: string;
+      }
+    }
+  }
+
+  /**
+   * A category-level split: which pages of which files fall under it, plus any
+   * partitions inside it. Extraction data lives under `extractions[]` — join by
+   * `split_name`.
+   */
+  export interface Split {
+    /**
+     * 0-100 aggregate confidence (min across partitions).
+     */
+    confidence: number;
+
+    /**
+     * Per-file page lists, union of all partitions.
+     */
+    files: Array<Split.File>;
+
+    /**
+     * The split's category name.
+     */
+    name: string;
+
+    partitions?: Array<Split.Partition>;
+  }
+
+  export namespace Split {
+    /**
+     * A file's contribution of pages to a split or partition. 1-indexed.
+     */
+    export interface File {
+      /**
+       * The file's UUID.
+       */
+      file_id: string;
+
+      /**
+       * The file's display name.
+       */
+      file_name: string;
+
+      /**
+       * 1-indexed page numbers from this file.
+       */
+      pages: Array<number>;
+    }
+
+    /**
+     * A partition value within a split (e.g. `1234-5678` under `Account Holdings`).
+     */
+    export interface Partition {
+      /**
+       * 0-100 minimum confidence across the partition's ranges.
+       */
+      confidence: number;
+
+      files: Array<Partition.File>;
+
+      /**
+       * The partition value (free-form string).
+       */
+      name: string;
+    }
+
+    export namespace Partition {
+      /**
+       * A file's contribution of pages to a split or partition. 1-indexed.
+       */
+      export interface File {
+        /**
+         * The file's UUID.
+         */
+        file_id: string;
+
+        /**
+         * The file's display name.
+         */
+        file_name: string;
+
+        /**
+         * 1-indexed page numbers from this file.
+         */
+        pages: Array<number>;
+      }
+    }
   }
 }
 
@@ -624,6 +1005,13 @@ export interface WorkflowRunResponse {
   status: string;
 
   /**
+   * The workflow version this run was bound to (the latest version at submission
+   * time). Lets callers verify which schema produced the results — useful right
+   * after an edit.
+   */
+  version_id: string;
+
+  /**
    * The UUID of the workflow that was executed.
    */
   workflow_id: string;
@@ -646,20 +1034,927 @@ export interface WorkflowUploadResponse {
 }
 
 export interface WorkflowCreateParams {
-  /**
-   * Field definitions
-   */
-  fields: Array<{ [key: string]: unknown }>;
-
-  /**
-   * Workflow name
-   */
   name: string;
 
-  /**
-   * Workflow description
-   */
+  nodes: Array<
+    | WorkflowCreateParams.ParseNode
+    | WorkflowCreateParams.ClassifyNode
+    | WorkflowCreateParams.SplitterNode
+    | WorkflowCreateParams.ExtractNode
+    | WorkflowCreateParams.ValidateNode
+  >;
+
   description?: string | null;
+
+  edges?: Array<WorkflowCreateParams.Edge>;
+}
+
+export namespace WorkflowCreateParams {
+  export interface ParseNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    type: 'parse';
+
+    figure_enhancement?: boolean;
+
+    mode?: 'standard' | 'agentic';
+
+    /**
+     * Free-form hint shown to the parse model to bias output.
+     */
+    prompt_hint?: string | null;
+  }
+
+  export interface ClassifyNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    categories: Array<ClassifyNode.Category>;
+
+    type: 'classify';
+
+    /**
+     * Optional prompt prefix for the classifier.
+     */
+    user_prompt?: string | null;
+  }
+
+  export namespace ClassifyNode {
+    export interface Category {
+      /**
+       * Stable category id used as the edge `branch` value when routing.
+       */
+      id: string;
+
+      /**
+       * Free-form description shown to the LLM.
+       */
+      description: string;
+
+      /**
+       * Display name shown to the LLM.
+       */
+      name: string;
+    }
+  }
+
+  export interface SplitterNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    rules: Array<SplitterNode.Rule>;
+
+    type: 'splitter';
+  }
+
+  export namespace SplitterNode {
+    export interface Rule {
+      id: string;
+
+      description: string;
+
+      name: string;
+
+      partition_key?: string;
+    }
+  }
+
+  export interface ExtractNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    /**
+     * Schema for the fields this node extracts. Required. The backend executor
+     * populates this from the ORM field tree before constructing the typed node;
+     * nothing else should be able to build an ExtractNode without it.
+     */
+    extraction_schema: ExtractNode.ExtractionSchema;
+
+    type: 'extract';
+
+    /**
+     * Inline lookup-file content for the typed create call. The backend uploads each
+     * entry to S3 and stores the resulting URI in `lookup_files`; this field is never
+     * persisted in GraphNode.config.
+     */
+    lookup_file_uploads?: Array<ExtractNode.LookupFileUpload>;
+
+    /**
+     * Smart-lookup reference document URIs persisted on the extract node.
+     */
+    lookup_files?: Array<string>;
+
+    /**
+     * Typed schema of fields the smart-lookup pass should produce. The _backend_
+     * derives this from the field tree (FieldWorkflowVersion rows whose source is
+     * SMART_LOOKUP) and attaches it to the node before the message hits the wire — the
+     * worker then reads it directly off the node, with no DB round-trip. Default
+     * empty: a node without smart-lookup fields carries an empty list.
+     */
+    lookup_schema?: Array<
+      | ExtractNode.StringField
+      | ExtractNode.IntegerField
+      | ExtractNode.FloatField
+      | ExtractNode.BooleanField
+      | ExtractNode.DateField
+      | ExtractNode.DatetimeField
+      | ExtractNode.EnumField
+      | ExtractNode.MultiSelectField
+      | ExtractNode.ObjectField
+    >;
+
+    /**
+     * Free-form hint shown to the smart-lookup matcher.
+     */
+    lookup_suggestion?: string | null;
+
+    mode?: 'standard' | 'agentic';
+
+    use_images?: boolean;
+  }
+
+  export namespace ExtractNode {
+    /**
+     * Schema for the fields this node extracts. Required. The backend executor
+     * populates this from the ORM field tree before constructing the typed node;
+     * nothing else should be able to build an ExtractNode without it.
+     */
+    export interface ExtractionSchema {
+      /**
+       * Field definitions making up this extract's output.
+       */
+      fields: Array<
+        | ExtractionSchema.StringField
+        | ExtractionSchema.IntegerField
+        | ExtractionSchema.FloatField
+        | ExtractionSchema.BooleanField
+        | ExtractionSchema.DateField
+        | ExtractionSchema.DatetimeField
+        | ExtractionSchema.EnumField
+        | ExtractionSchema.MultiSelectField
+        | ExtractionSchema.ObjectField
+      >;
+    }
+
+    export namespace ExtractionSchema {
+      export interface StringField {
+        data_type: 'string';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface IntegerField {
+        data_type: 'integer';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface FloatField {
+        data_type: 'float';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface BooleanField {
+        data_type: 'boolean';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface DateField {
+        data_type: 'date';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface DatetimeField {
+        data_type: 'datetime';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface EnumField {
+        data_type: 'enum';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<EnumField.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export namespace EnumField {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+
+      export interface MultiSelectField {
+        data_type: 'multi_select';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<MultiSelectField.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export namespace MultiSelectField {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+
+      export interface ObjectField {
+        data_type: 'object';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        nested_fields: Array<
+          | ObjectField.StringField
+          | ObjectField.IntegerField
+          | ObjectField.FloatField
+          | ObjectField.BooleanField
+          | ObjectField.DateField
+          | ObjectField.DatetimeField
+          | ObjectField.EnumField
+          | ObjectField.MultiSelectField
+          | unknown
+        >;
+
+        lookup?: boolean;
+      }
+
+      export namespace ObjectField {
+        export interface StringField {
+          data_type: 'string';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export interface IntegerField {
+          data_type: 'integer';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export interface FloatField {
+          data_type: 'float';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export interface BooleanField {
+          data_type: 'boolean';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export interface DateField {
+          data_type: 'date';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export interface DatetimeField {
+          data_type: 'datetime';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export interface EnumField {
+          data_type: 'enum';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          enum_options: Array<EnumField.EnumOption>;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export namespace EnumField {
+          export interface EnumOption {
+            /**
+             * Free-form description shown to the model.
+             */
+            description: string;
+
+            name: string;
+          }
+        }
+
+        export interface MultiSelectField {
+          data_type: 'multi_select';
+
+          /**
+           * Free-form description shown to the extraction model.
+           */
+          description: string;
+
+          enum_options: Array<MultiSelectField.EnumOption>;
+
+          /**
+           * Field name. Used as the key in the extraction response.
+           */
+          name: string;
+
+          lookup?: boolean;
+        }
+
+        export namespace MultiSelectField {
+          export interface EnumOption {
+            /**
+             * Free-form description shown to the model.
+             */
+            description: string;
+
+            name: string;
+          }
+        }
+      }
+    }
+
+    /**
+     * Inline lookup-file content carried on the typed create call.
+     *
+     * The backend reads `filename` + `content` (base64-encoded bytes), uploads the
+     * file to S3 during workflow create, and stores the resulting URI in
+     * `ExtractNode.lookup_files`. This field is stripped from the persisted
+     * `GraphNode.config` — it is create-input only.
+     */
+    export interface LookupFileUpload {
+      /**
+       * Base64-encoded file bytes.
+       */
+      content: string;
+
+      filename: string;
+    }
+
+    export interface StringField {
+      data_type: 'string';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export interface IntegerField {
+      data_type: 'integer';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export interface FloatField {
+      data_type: 'float';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export interface BooleanField {
+      data_type: 'boolean';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export interface DateField {
+      data_type: 'date';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export interface DatetimeField {
+      data_type: 'datetime';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export interface EnumField {
+      data_type: 'enum';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      enum_options: Array<EnumField.EnumOption>;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export namespace EnumField {
+      export interface EnumOption {
+        /**
+         * Free-form description shown to the model.
+         */
+        description: string;
+
+        name: string;
+      }
+    }
+
+    export interface MultiSelectField {
+      data_type: 'multi_select';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      enum_options: Array<MultiSelectField.EnumOption>;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      lookup?: boolean;
+    }
+
+    export namespace MultiSelectField {
+      export interface EnumOption {
+        /**
+         * Free-form description shown to the model.
+         */
+        description: string;
+
+        name: string;
+      }
+    }
+
+    export interface ObjectField {
+      data_type: 'object';
+
+      /**
+       * Free-form description shown to the extraction model.
+       */
+      description: string;
+
+      /**
+       * Field name. Used as the key in the extraction response.
+       */
+      name: string;
+
+      nested_fields: Array<
+        | ObjectField.StringField
+        | ObjectField.IntegerField
+        | ObjectField.FloatField
+        | ObjectField.BooleanField
+        | ObjectField.DateField
+        | ObjectField.DatetimeField
+        | ObjectField.EnumField
+        | ObjectField.MultiSelectField
+        | unknown
+      >;
+
+      lookup?: boolean;
+    }
+
+    export namespace ObjectField {
+      export interface StringField {
+        data_type: 'string';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface IntegerField {
+        data_type: 'integer';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface FloatField {
+        data_type: 'float';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface BooleanField {
+        data_type: 'boolean';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface DateField {
+        data_type: 'date';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface DatetimeField {
+        data_type: 'datetime';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export interface EnumField {
+        data_type: 'enum';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<EnumField.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export namespace EnumField {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+
+      export interface MultiSelectField {
+        data_type: 'multi_select';
+
+        /**
+         * Free-form description shown to the extraction model.
+         */
+        description: string;
+
+        enum_options: Array<MultiSelectField.EnumOption>;
+
+        /**
+         * Field name. Used as the key in the extraction response.
+         */
+        name: string;
+
+        lookup?: boolean;
+      }
+
+      export namespace MultiSelectField {
+        export interface EnumOption {
+          /**
+           * Free-form description shown to the model.
+           */
+          description: string;
+
+          name: string;
+        }
+      }
+    }
+  }
+
+  export interface ValidateNode {
+    /**
+     * Stable identifier for this node within the graph.
+     */
+    id: string;
+
+    rules: Array<ValidateNode.Rule>;
+
+    type: 'validate';
+  }
+
+  export namespace ValidateNode {
+    export interface Rule {
+      /**
+       * Stable rule id; round-trips through ValidationResult.rule_id.
+       */
+      id: string;
+
+      /**
+       * Natural-language description shown to the validation model.
+       */
+      description: string;
+
+      /**
+       * Optional human-readable rule name shown on the rule card in the Studio. Stored
+       * verbatim on the GraphNode config and surfaced back through the config endpoint
+       * so renames round-trip.
+       */
+      name?: string | null;
+
+      severity?: 'error' | 'warning';
+
+      /**
+       * Persistent ids of fields this rule references.
+       */
+      source_fields?: Array<string>;
+    }
+  }
+
+  /**
+   * A directed edge between two nodes. `branch` carries the source-port label used
+   * for routing out of `classify` (category id) or `splitter` (rule id) nodes.
+   */
+  export interface Edge {
+    source: string;
+
+    target: string;
+
+    /**
+     * Source-port label for branch routing. Required when leaving a classify or
+     * splitter node by category/rule.
+     */
+    branch?: string | null;
+  }
 }
 
 export interface WorkflowListParams {
